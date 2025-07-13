@@ -10,6 +10,7 @@ A modern web template marketplace built with Next.js, Fastify, MongoDB, and Stri
 - **Responsive Design**: Modern UI with TailwindCSS and yellow theme
 - **Real-time Updates**: WebSocket support for live notifications
 - **Testing**: Comprehensive test suite with Jest and Playwright
+- **CI/CD**: Automated testing, linting, and building pipeline
 
 ## 🏗️ Architecture
 
@@ -21,6 +22,7 @@ codeskins/
 ├── docker/            # Docker configurations
 ├── nginx/             # Nginx reverse proxy
 ├── scripts/           # Build and deployment scripts
+├── .github/           # CI/CD workflows and templates
 └── e2e/              # End-to-end tests
 ```
 
@@ -48,6 +50,23 @@ codeskins/
 - **Nginx** - Reverse proxy
 - **Jest** - Testing framework
 - **Playwright** - E2E testing
+- **GitHub Actions** - CI pipeline
+
+## 🔄 CI Pipeline
+
+### Automated Workflows
+
+#### 🧪 **CI Pipeline** (`.github/workflows/ci.yml`)
+- **Triggered on**: Push to `main`/`develop` branches and Pull Requests
+- **Jobs**:
+  - **Backend**: Type checking, linting, testing with MongoDB service, and build
+  - **Frontend**: Type checking, linting, testing, and build
+
+### 📋 **Quality Gates**
+- All tests must pass
+- Linting standards met
+- Type checking successful
+- Build process successful
 
 ## 📦 Installation
 
@@ -281,11 +300,23 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## 🤝 Contributing
 
+### Development Workflow
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Make your changes following the coding standards
+4. Add tests for new functionality
+5. Ensure all tests pass (`pnpm test`)
+6. Run linting (`pnpm lint`)
+7. Commit your changes (`git commit -m 'Add amazing feature'`)
+8. Push to the branch (`git push origin feature/amazing-feature`)
+9. Open a Pull Request
+
+### Code Quality Standards
+- Follow TypeScript best practices
+- Maintain test coverage above 80%
+- Use conventional commit messages
+- Follow ESLint rules
+- Add JSDoc comments for complex functions
 
 ## 📄 License
 
