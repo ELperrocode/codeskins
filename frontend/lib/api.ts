@@ -9,7 +9,7 @@ interface ApiResponse<T = any> {
 
 interface User {
   _id: string;
-  email: string;
+  username: string;
   role: 'customer' | 'seller' | 'admin';
   isActive: boolean;
   createdAt: string;
@@ -18,15 +18,15 @@ interface User {
 
 interface AuthResponse {
   user: User;
-  token: string;
 }
 
 interface LoginData {
-  email: string;
+  username: string;
   password: string;
 }
 
 interface RegisterData {
+  username: string;
   email: string;
   password: string;
   role: 'customer' | 'seller' | 'admin';
@@ -38,34 +38,24 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const config: RequestInit = {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
     },
-    ...options,
+    credentials: 'include', // Send cookies with requests
   };
-
-  // Add auth token if available
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
-    }
-  }
 
   try {
     const response = await fetch(url, config);
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || 'API request failed');
     }
-    
+
     return data;
   } catch (error) {
     console.error('API request failed:', error);
@@ -74,17 +64,17 @@ async function apiRequest<T>(
 }
 
 // Authentication API functions
-export const login = async (email: string, password: string): Promise<ApiResponse<AuthResponse>> => {
+export const login = async (username: string, password: string): Promise<ApiResponse<AuthResponse>> => {
   return apiRequest<AuthResponse>('/api/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username, password }),
   });
 };
 
-export const register = async (email: string, password: string, role: 'customer' | 'seller' | 'admin'): Promise<ApiResponse<AuthResponse>> => {
+export const register = async (username: string, email: string, password: string, role: 'customer' | 'seller' | 'admin'): Promise<ApiResponse<AuthResponse>> => {
   return apiRequest<AuthResponse>('/api/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, password, role }),
+    body: JSON.stringify({ username, email, password, role }),
   });
 };
 
@@ -95,6 +85,7 @@ export const getProfile = async (): Promise<ApiResponse<{ user: User }>> => {
 export const logout = async (): Promise<ApiResponse> => {
   return apiRequest('/api/auth/logout', {
     method: 'POST',
+    body: JSON.stringify({}), // Send empty JSON body
   });
 };
 

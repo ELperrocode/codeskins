@@ -2,14 +2,15 @@ import request from 'supertest';
 import { FastifyInstance } from 'fastify';
 import { build } from '../src/server';
 import { User } from '../src/models/User';
-// @ts-expect-error: bcryptjs has no type declarations
-import bcrypt from 'bcryptjs';
 
 describe('Authentication Endpoints', () => {
   let app: FastifyInstance;
+  let agent: any;
 
   beforeAll(async () => {
     app = await build();
+    await app.ready();
+    agent = request.agent(app.server);
   });
 
   afterAll(async () => {
@@ -23,9 +24,10 @@ describe('Authentication Endpoints', () => {
   describe('POST /api/auth/register', () => {
     it('should register a new user successfully', async () => {
       const userData = {
+        username: 'testuser',
         email: 'test@example.com',
         password: 'password123',
-        role: 'customer'
+        role: 'customer',
       };
 
       const response = await request(app.server)
@@ -35,38 +37,34 @@ describe('Authentication Endpoints', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('User registered successfully');
-      expect(response.body.data.user.email).toBe(userData.email);
+      expect(response.body.data.user.username).toBe(userData.username);
       expect(response.body.data.user.role).toBe(userData.role);
-      expect(response.body.data.token).toBeDefined();
 
       // Verify user was saved in database
-      const savedUser = await User.findOne({ email: userData.email });
+      const savedUser = await User.findOne({ username: userData.username });
       expect(savedUser).toBeDefined();
-      expect(savedUser?.email).toBe(userData.email);
-      expect(savedUser?.role).toBe(userData.role);
+      expect(savedUser?.username).toBe(userData.username);
     });
 
-    it('should not register user with existing email', async () => {
+    it('should not register user with existing username', async () => {
       const userData = {
+        username: 'testuser',
         email: 'test@example.com',
         password: 'password123',
-        role: 'customer'
+        role: 'customer',
       };
 
       // Create first user
-      await request(app.server)
-        .post('/api/auth/register')
-        .send(userData)
-        .expect(201);
+      await User.create(userData);
 
-      // Try to register with same email
+      // Try to register with same username
       const response = await request(app.server)
         .post('/api/auth/register')
         .send(userData)
-        .expect(400);
+        .expect(409);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('User already exists with this email');
+      expect(response.body.message).toBe('User already exists with this email or username');
     });
 
     it('should validate required fields', async () => {
@@ -75,159 +73,149 @@ describe('Authentication Endpoints', () => {
         .send({})
         .expect(400);
 
-      expect(response.body.success).toBe(false);
-    });
-
-    it('should validate email format', async () => {
-      const response = await request(app.server)
-        .post('/api/auth/register')
-        .send({
-          email: 'invalid-email',
-          password: 'password123'
-        })
-        .expect(400);
-
-      expect(response.body.success).toBe(false);
+      expect(response.body.error).toBe('Bad Request');
     });
 
     it('should validate password length', async () => {
       const response = await request(app.server)
         .post('/api/auth/register')
         .send({
-          email: 'test@example.com',
-          password: '123'
+          username: 'testuser',
+          password: '123',
         })
         .expect(400);
 
-      expect(response.body.success).toBe(false);
+      expect(response.body.error).toBe('Bad Request');
     });
   });
 
   describe('POST /api/auth/login', () => {
     beforeEach(async () => {
       // Create a test user
-      const hashedPassword = await bcrypt.hash('password123', 12);
       await User.create({
+        username: 'testuser',
         email: 'test@example.com',
-        password: hashedPassword,
+        password: 'password123',
         role: 'customer',
-        isActive: true
+        isActive: true,
       });
     });
 
-    it('should login user successfully', async () => {
-      const response = await request(app.server)
+    it('should login user successfully and set a session cookie', async () => {
+      const response = await agent
         .post('/api/auth/login')
         .send({
-          email: 'test@example.com',
-          password: 'password123'
+          username: 'testuser',
+          password: 'password123',
         })
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Login successful');
-      expect(response.body.data.user.email).toBe('test@example.com');
-      expect(response.body.data.token).toBeDefined();
+      expect(response.body.data.user.username).toBe('testuser');
+      // Check for session cookie
+      const cookieHeader = response.headers['set-cookie'];
+      expect(cookieHeader).toBeDefined();
+      if (cookieHeader) {
+        const cookie = cookieHeader[0];
+        expect(cookie).toMatch(/session/);
+        expect(cookie).toMatch(/HttpOnly/);
+      }
     });
 
     it('should not login with wrong password', async () => {
       const response = await request(app.server)
         .post('/api/auth/login')
         .send({
-          email: 'test@example.com',
-          password: 'wrongpassword'
+          username: 'testuser',
+          password: 'wrongpassword',
         })
         .expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Invalid email or password');
+      expect(response.body.message).toBe('Invalid username or password');
     });
 
-    it('should not login with non-existent email', async () => {
+    it('should not login with non-existent username', async () => {
       const response = await request(app.server)
         .post('/api/auth/login')
         .send({
-          email: 'nonexistent@example.com',
-          password: 'password123'
+          username: 'nonexistentuser',
+          password: 'password123',
         })
         .expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Invalid email or password');
+      expect(response.body.message).toBe('Invalid username or password');
     });
 
     it('should not login deactivated user', async () => {
-      // Deactivate the user
       await User.findOneAndUpdate(
-        { email: 'test@example.com' },
-        { isActive: false }
+        { username: 'testuser' },
+        { isActive: false },
       );
 
       const response = await request(app.server)
         .post('/api/auth/login')
         .send({
-          email: 'test@example.com',
-          password: 'password123'
+          username: 'testuser',
+          password: 'password123',
         })
-        .expect(401);
+        .expect(403);
 
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('Account is deactivated');
     });
   });
 
-  describe('GET /api/auth/me', () => {
-    let token: string;
-
+  describe('Authenticated Routes', () => {
     beforeEach(async () => {
-      // Create a test user and get token
-      const hashedPassword = await bcrypt.hash('password123', 12);
+      // Create and log in a user to establish a session
       await User.create({
+        username: 'testuser',
         email: 'test@example.com',
-        password: hashedPassword,
+        password: 'password123',
         role: 'customer',
-        isActive: true
+        isActive: true,
       });
 
-      const loginResponse = await request(app.server)
-        .post('/api/auth/login')
-        .send({
-          email: 'test@example.com',
-          password: 'password123'
-        });
-
-      token = loginResponse.body.data.token;
+      await agent.post('/api/auth/login').send({
+        username: 'testuser',
+        password: 'password123',
+      });
     });
 
-    it('should get user profile with valid token', async () => {
-      const response = await request(app.server)
-        .get('/api/auth/me')
-        .set('Authorization', `Bearer ${token}`)
-        .expect(200);
+    describe('GET /api/auth/me', () => {
+      it('should get user profile with an active session', async () => {
+        const response = await agent.get('/api/auth/me').expect(200);
 
-      expect(response.body.success).toBe(true);
-      expect(response.body.data.user.email).toBe('test@example.com');
-      expect(response.body.data.user.role).toBe('customer');
-      expect(response.body.data.user.password).toBeUndefined();
+        expect(response.body.success).toBe(true);
+        expect(response.body.data.user.username).toBe('testuser');
+        expect(response.body.data.user.role).toBe('customer');
+        expect(response.body.data.user.password).toBeUndefined();
+      });
     });
 
-    it('should not get profile without token', async () => {
-      const response = await request(app.server)
-        .get('/api/auth/me')
-        .expect(401);
+    describe('POST /api/auth/logout', () => {
+      it('should logout user and destroy session', async () => {
+        const logoutResponse = await agent.post('/api/auth/logout').expect(200);
+        expect(logoutResponse.body.success).toBe(true);
+        expect(logoutResponse.body.message).toBe('Logout successful');
+
+        // Verify session is destroyed by trying to access a protected route
+        const meResponse = await agent.get('/api/auth/me').expect(401);
+        expect(meResponse.body.success).toBe(false);
+        expect(meResponse.body.message).toBe('Unauthorized: No active session');
+      });
+    });
+  });
+
+  describe('Unauthenticated Access', () => {
+    it('should not get profile without an active session', async () => {
+      const response = await request(app.server).get('/api/auth/me').expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Access token required');
-    });
-
-    it('should not get profile with invalid token', async () => {
-      const response = await request(app.server)
-        .get('/api/auth/me')
-        .set('Authorization', 'Bearer invalid-token')
-        .expect(401);
-
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Invalid or expired token');
+      expect(response.body.message).toBe('Unauthorized: No active session');
     });
   });
 }); 

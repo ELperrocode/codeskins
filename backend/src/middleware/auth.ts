@@ -1,29 +1,12 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import jwt from 'jsonwebtoken';
+import { FastifyRequest, FastifyReply } from 'fastify'
 
 export const authenticate = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
-  try {
-    const authHeader = request.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      reply.status(401).send({
-        success: false,
-        message: 'Access token required'
-      });
-      return;
-    }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    
-    const decoded = jwt.verify(token, process.env['JWT_SECRET'] || 'fallback-secret') as any;
-    
-    // Add user info to request
-    (request as any).user = decoded;
-    
-  } catch (error) {
-    reply.status(401).send({
+  // Check if user data exists in session
+  const sessionUser = request.session.user
+  if (!sessionUser || !sessionUser.id) {
+    return reply.status(401).send({
       success: false,
-      message: 'Invalid or expired token'
-    });
+      message: 'Unauthorized: No active session',
+    })
   }
-}; 
+} 

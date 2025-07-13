@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
-// @ts-expect-error: bcryptjs has no type declarations
 import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
+  username: string;
   email: string;
   password: string;
   role: 'customer' | 'seller' | 'admin';
@@ -13,6 +13,15 @@ export interface IUser extends Document {
 }
 
 const userSchema = new Schema<IUser>({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true,
+    trim: true,
+    minlength: 3,
+    maxlength: 30,
+  },
   email: {
     type: String,
     required: true,

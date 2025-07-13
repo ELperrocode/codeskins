@@ -5,7 +5,7 @@ import { login as apiLogin, register as apiRegister, getProfile, logout as apiLo
 
 interface User {
   _id: string;
-  email: string;
+  username: string;
   role: 'customer' | 'seller' | 'admin';
   isActive: boolean;
   createdAt: string;
@@ -15,8 +15,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, role: 'customer' | 'seller' | 'admin') => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string, role: 'customer' | 'seller') => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -42,24 +42,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const savedUser = localStorage.getItem('user');
-        
-        if (token && savedUser) {
-          // Verify token is still valid
-          const response = await getProfile();
-          if (response.success) {
-            setUser(response.data!.user);
-          } else {
-            // Token is invalid, clear storage
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-          }
+        // Verify session with the server
+        const response = await getProfile();
+        if (response.success && response.data) {
+          setUser(response.data.user);
+        } else {
+          // No valid session
+          setUser(null);
+          localStorage.removeItem('user');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        // Clear invalid data
-        localStorage.removeItem('token');
+        setUser(null);
         localStorage.removeItem('user');
       } finally {
         setIsLoading(false);
@@ -69,13 +63,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
-      const response = await apiLogin(email, password);
+      const response = await apiLogin(username, password);
       if (response.success && response.data) {
-        const { user, token } = response.data;
+        const { user } = response.data;
         setUser(user);
-        localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
       } else {
         throw new Error(response.message || 'Login failed');
@@ -86,13 +79,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (email: string, password: string, role: 'customer' | 'seller' | 'admin') => {
+  const register = async (username: string, email: string, password: string, role: 'customer' | 'seller') => {
     try {
-      const response = await apiRegister(email, password, role);
+      const response = await apiRegister(username, email, password, role);
       if (response.success && response.data) {
-        const { user, token } = response.data;
+        const { user } = response.data;
         setUser(user);
-        localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
       } else {
         throw new Error(response.message || 'Registration failed');
@@ -110,7 +102,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
-      localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
   };
