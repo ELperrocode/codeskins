@@ -1,12 +1,34 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { IconRocket, IconCode, IconPalette, IconUsers, IconStar, IconDownload, IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconMail } from '@tabler/icons-react';
 import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { getReviews } from '../../../lib/api';
+
 
 export default function AboutPage() {
   const { t } = useTranslation();
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      setLoadingTestimonials(true);
+      try {
+        const response = await getReviews('all', { limit: 8 });
+        if (response.success && response.data?.reviews) {
+          setTestimonials(response.data.reviews);
+        }
+      } catch (error) {
+        setTestimonials([]);
+      } finally {
+        setLoadingTestimonials(false);
+      }
+    }
+    fetchTestimonials();
+  }, []);
 
   const features = [
     {
@@ -108,7 +130,6 @@ export default function AboutPage() {
               {t('about.features.subtitle')}
             </p>
           </motion.div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <motion.div
@@ -133,6 +154,62 @@ export default function AboutPage() {
                 </Card>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="relative z-10 py-20 px-4 overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              {t('about.testimonials.title')}
+            </h2>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
+              {t('about.testimonials.subtitle')}
+            </p>
+          </motion.div>
+          <div className="relative">
+            <div className="flex flex-wrap justify-center gap-6">
+              {loadingTestimonials ? (
+                <div className="text-white text-lg mx-auto">Cargando testimonios...</div>
+              ) : testimonials.length === 0 ? (
+                <div className="text-white text-lg mx-auto">No hay testimonios aún.</div>
+              ) : (
+                testimonials.map((testimonial, index) => (
+                  <div key={testimonial._id || index} className="flex-shrink-0 w-80 mx-4">
+                    <Card className="backdrop-blur-md bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 h-full">
+                      <CardContent className="p-6">
+                        <div className="flex mb-4">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <p className="text-white/90 mb-4 italic">"{testimonial.comment}"</p>
+                        <div className="flex items-center">
+                          <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mr-4">
+                            <span className="text-white font-bold text-lg">
+                              {testimonial.userId?.username?.slice(0, 2).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold">{testimonial.userId?.username || 'Anonymous'}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -195,4 +272,4 @@ export default function AboutPage() {
       </section>
     </div>
   );
-} 
+}

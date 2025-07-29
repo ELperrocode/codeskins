@@ -17,6 +17,64 @@ interface UpdateReviewBody {
 
 export const registerReviewRoutes = (fastify: FastifyInstance): void => {
   // Get reviews for a template (public)
+  // Get global reviews (for landing testimonials)
+  fastify.get<{ Querystring: { limit?: string; page?: string } }>(
+    '/all',
+    {
+      schema: {
+        querystring: {
+          type: 'object',
+          properties: {
+            limit: { type: 'string' },
+            page: { type: 'string' },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const page = parseInt(request.query.page || '1');
+        const limit = parseInt(request.query.limit || '10');
+        const skip = (page - 1) * limit;
+
+        // Get latest reviews from all templates
+        const reviews = await Review.find({ isActive: true })
+          .populate('userId', 'username firstName lastName')
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+
+        const total = await Review.countDocuments({ isActive: true });
+
+        // Calculate average rating globally
+        const avgRating = await Review.aggregate([
+          { $match: { isActive: true } },
+          { $group: { _id: null, avgRating: { $avg: '$rating' } } }
+        ]);
+        const averageRating = avgRating.length > 0 ? avgRating[0].avgRating : 0;
+
+        reply.send({
+          success: true,
+          data: {
+            reviews,
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages: Math.ceil(total / limit),
+              hasNext: page * limit < total,
+              hasPrev: page > 1,
+            },
+            averageRating: Math.round(averageRating * 10) / 10,
+            totalReviews: total,
+          },
+        });
+      } catch (error) {
+        fastify.log.error(error);
+        reply.status(500).send({ success: false, message: 'Internal Server Error' });
+      }
+    }
+  );
   fastify.get<{ Querystring: { templateId: string; page?: string; limit?: string } }>(
     '/',
     {

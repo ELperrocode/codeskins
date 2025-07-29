@@ -568,6 +568,26 @@ export const deleteReview = async (id: string): Promise<ApiResponse<{ message: s
 };
 
 // Favorites API
+// Fetch all global reviews (testimonials)
+export const getAllReviews = async (params?: {
+  page?: number;
+  limit?: number;
+}): Promise<ApiResponse<{
+  reviews: any[];
+  pagination?: any;
+  totalReviews?: number;
+}>> => {
+  const searchParams = new URLSearchParams();
+  if (params?.page) searchParams.append('page', params.page.toString());
+  if (params?.limit) searchParams.append('limit', params.limit.toString());
+  const queryString = searchParams.toString();
+  const endpoint = `/api/reviews/all${queryString ? `?${queryString}` : ''}`;
+  return apiRequest<{
+    reviews: any[];
+    pagination?: any;
+    totalReviews?: number;
+  }>(endpoint);
+};
 export const getFavorites = async (): Promise<ApiResponse<{ favorites: any[] }>> => {
   return apiRequest<{ favorites: any[] }>('/api/favorites');
 };
