@@ -3,8 +3,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ICartItem {
   templateId: mongoose.Types.ObjectId;
   title: string;
+  description?: string;
   price: number;
   quantity: number;
+  previewImages?: string[];
+  category?: string;
+  tags?: string[];
 }
 
 export interface ICart extends Document {
@@ -19,8 +23,12 @@ export interface ICart extends Document {
 const cartItemSchema = new Schema<ICartItem>({
   templateId: { type: Schema.Types.ObjectId, ref: 'Template', required: true },
   title: { type: String, required: true },
+  description: { type: String },
   price: { type: Number, required: true, min: 0 },
-  quantity: { type: Number, required: true, default: 1, min: 1 }
+  quantity: { type: Number, required: true, default: 1, min: 1 },
+  previewImages: [{ type: String }],
+  category: { type: String },
+  tags: [{ type: String }]
 });
 
 const cartSchema = new Schema<ICart>({

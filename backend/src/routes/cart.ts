@@ -94,12 +94,16 @@ export const registerCartRoutes = (fastify: FastifyInstance): void => {
         
         cart.items[existingItemIndex].quantity = newQuantity;
       } else {
-        // Add new item
+        // Add new item with additional information
         cart.items.push({
           templateId: template._id as any,
           title: template.title,
+          description: template.description,
           price: template.price,
-          quantity
+          quantity,
+          previewImages: template.previewImages || [],
+          category: template.category,
+          tags: template.tags || []
         });
       }
 

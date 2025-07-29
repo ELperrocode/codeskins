@@ -15,8 +15,12 @@ import { CartItem, OrderSummary } from '../../../components/cart';
 interface CartItem {
   templateId: string;
   title: string;
+  description?: string;
   price: number;
   quantity: number;
+  previewImages?: string[];
+  category?: string;
+  tags?: string[];
 }
 
 interface Cart {
