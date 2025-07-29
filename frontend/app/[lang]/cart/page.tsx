@@ -69,27 +69,8 @@ export default function CartPage() {
   };
 
   const updateItemQuantity = async (templateId: string, quantity: number) => {
-    if (quantity <= 0) {
-      await removeItem(templateId);
-      return;
-    }
-
-    try {
-      setIsUpdating(true);
-      const response = await updateCartItem(templateId, quantity);
-      if (response.success && response.data) {
-        setCart(response.data.cart);
-        await updateCartCount();
-        showCartUpdate(`Quantity updated successfully`);
-      } else {
-        showCartError(response.message || 'Failed to update quantity');
-      }
-    } catch (error) {
-      console.error('Error updating cart:', error);
-      handleNetworkError(error, 'Failed to update quantity');
-    } finally {
-      setIsUpdating(false);
-    }
+    // Quantity updates are disabled - only 1 template per cart item
+    showCartError('Quantity updates are not allowed. Only 1 template per cart item.');
   };
 
   const removeItem = async (templateId: string) => {

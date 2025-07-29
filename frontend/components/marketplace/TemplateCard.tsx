@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
-import { addToCart } from '../../lib/api';
+import { useCart } from '../../lib/cart-context';
+import { addToCart, addToFavorites, removeFromFavorites, checkFavorite } from '../../lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -23,6 +24,13 @@ interface TemplateCardProps {
     downloads: number;
     category: string;
     features: string[];
+    sales: number;
+    licenseId?: {
+      _id: string;
+      name: string;
+      price: number;
+      maxSales?: number;
+    };
     ownerId: {
       _id: string;
       username: string;
@@ -37,21 +45,46 @@ export function TemplateCard({
 }: TemplateCardProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const { incrementCartCount } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isInWishlistState, setIsInWishlistState] = useState(isInWishlist);
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
+
+  // Check if template is in favorites when component mounts
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user) {
+        try {
+          const response = await checkFavorite(template._id);
+          if (response.success && response.data) {
+            setIsInWishlistState(response.data.isFavorited);
+          }
+        } catch (error) {
+          console.error('Error checking favorite status:', error);
+        }
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [user, template._id]);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!user) {
-      router.push('/login');
+      // Get current language from URL or default to 'en'
+      const pathname = window.location.pathname;
+      const lang = pathname.split('/')[1] || 'en';
+      router.push(`/${lang}/login`);
       return;
     }
 
     setIsAddingToCart(true);
     try {
       await addToCart(template._id, 1);
+      // Increment cart count after successful addition
+      incrementCartCount(1);
       // You could show a success toast here
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -61,11 +94,34 @@ export function TemplateCard({
     }
   };
 
-  const handleAddToWishlist = (e: React.MouseEvent) => {
+  const handleAddToWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsInWishlistState(!isInWishlistState);
-    // TODO: Implement wishlist functionality
+
+    if (!user) {
+      // Get current language from URL or default to 'en'
+      const pathname = window.location.pathname;
+      const lang = pathname.split('/')[1] || 'en';
+      router.push(`/${lang}/login`);
+      return;
+    }
+
+    setIsUpdatingWishlist(true);
+    try {
+      if (isInWishlistState) {
+        // Remove from favorites
+        await removeFromFavorites(template._id);
+        setIsInWishlistState(false);
+      } else {
+        // Add to favorites
+        await addToFavorites(template._id);
+        setIsInWishlistState(true);
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+    } finally {
+      setIsUpdatingWishlist(false);
+    }
   };
 
   const handleCardClick = () => {
@@ -97,11 +153,16 @@ export function TemplateCard({
         {/* Wishlist Button */}
         <button
           onClick={handleAddToWishlist}
-          className="absolute top-2 right-2 p-2 bg-white/80 hover:bg-white rounded-full transition-colors"
+          disabled={isUpdatingWishlist}
+          className="absolute top-2 right-2 p-2 bg-white/80 hover:bg-white rounded-full transition-colors disabled:opacity-50"
         >
-          <IconHeart 
-            className={`w-5 h-5 ${isInWishlistState ? 'text-red-500 fill-current' : 'text-gray-600'}`} 
-          />
+          {isUpdatingWishlist ? (
+            <div className="w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <IconHeart 
+              className={`w-5 h-5 ${isInWishlistState ? 'text-red-500 fill-current' : 'text-gray-600'}`} 
+            />
+          )}
         </button>
 
         {/* Category Badge */}
@@ -162,6 +223,42 @@ export function TemplateCard({
           </div>
         </div>
 
+        {/* Availability Indicator */}
+        {template.licenseId?.maxSales && template.licenseId.maxSales > 0 && (
+          <div className="mb-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Availability:</span>
+              <span className={`font-medium ${
+                template.sales >= template.licenseId.maxSales 
+                  ? 'text-red-600' 
+                  : template.sales >= template.licenseId.maxSales * 0.8 
+                    ? 'text-orange-600' 
+                    : 'text-green-600'
+              }`}>
+                {template.sales >= template.licenseId.maxSales 
+                  ? 'Sold Out' 
+                  : `${template.licenseId.maxSales - template.sales}/${template.licenseId.maxSales} remaining`
+                }
+              </span>
+            </div>
+            {/* Progress bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+              <div 
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  template.sales >= template.licenseId.maxSales 
+                    ? 'bg-red-500' 
+                    : template.sales >= template.licenseId.maxSales * 0.8 
+                      ? 'bg-orange-500' 
+                      : 'bg-green-500'
+                }`}
+                style={{ 
+                  width: `${Math.min(100, (template.sales / template.licenseId.maxSales) * 100)}%` 
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Features */}
         {template.features.length > 0 && (
           <div className="mb-3">
@@ -185,11 +282,23 @@ export function TemplateCard({
         <div className="flex space-x-2">
           <Button
             onClick={handleAddToCart}
-            disabled={isAddingToCart}
-            className="flex-1 bg-gradient-primary hover:bg-gradient-primary-hover"
+            disabled={
+              isAddingToCart || 
+              !!(template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales)
+            }
+            className={`flex-1 ${
+              template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-gradient-primary hover:bg-gradient-primary-hover'
+            }`}
           >
             <IconShoppingCart className="w-4 h-4 mr-2" />
-            {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+            {isAddingToCart 
+              ? 'Adding...' 
+              : (template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales)
+                ? 'Sold Out'
+                : 'Add to Cart'
+            }
           </Button>
           
           {template.previewUrl && (
@@ -211,7 +320,10 @@ export function TemplateCard({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              router.push(`/templates/${template._id}`);
+              // Get current language from URL or default to 'en'
+              const pathname = window.location.pathname;
+              const lang = pathname.split('/')[1] || 'en';
+              router.push(`/${lang}/templates/${template._id}`);
             }}
             title="View Details"
           >

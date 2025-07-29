@@ -1,9 +1,13 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
+import { useAuth } from '../../lib/auth-context';
+import { addToFavorites, removeFromFavorites, checkFavorite } from '../../lib/api';
 import { 
   IconStar, 
   IconDownload, 
@@ -33,7 +37,8 @@ interface TemplateInfoProps {
     licenseId?: {
       _id: string;
       name: string;
-      maxDownloads: number;
+      price: number;
+      maxSales?: number;
     };
     ownerId: {
       _id: string;
@@ -45,6 +50,56 @@ interface TemplateInfoProps {
 }
 
 export function TemplateInfo({ template, onAddToCart, addingToCart }: TemplateInfoProps) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
+
+  // Check if template is in favorites when component mounts
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user) {
+        try {
+          const response = await checkFavorite(template._id);
+          if (response.success && response.data) {
+            setIsInWishlist(response.data.isFavorited);
+          }
+        } catch (error) {
+          console.error('Error checking favorite status:', error);
+        }
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [user, template._id]);
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      // Get current language from URL or default to 'en'
+      const pathname = window.location.pathname;
+      const lang = pathname.split('/')[1] || 'en';
+      router.push(`/${lang}/login`);
+      return;
+    }
+
+    setIsUpdatingWishlist(true);
+    try {
+      if (isInWishlist) {
+        // Remove from favorites
+        await removeFromFavorites(template._id);
+        setIsInWishlist(false);
+      } else {
+        // Add to favorites
+        await addToFavorites(template._id);
+        setIsInWishlist(true);
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+    } finally {
+      setIsUpdatingWishlist(false);
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -225,12 +280,59 @@ export function TemplateInfo({ template, onAddToCart, addingToCart }: TemplateIn
                 <div>
                   <h4 className="font-semibold text-blue-900">{template.licenseId.name}</h4>
                   <p className="text-sm text-blue-700">
-                    {template.licenseId.maxDownloads === -1 
-                      ? 'Unlimited downloads' 
-                      : `${template.licenseId.maxDownloads} downloads included`
-                    }
+                    License includes unlimited downloads
                   </p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Availability Indicator */}
+        {template.licenseId?.maxSales && template.licenseId.maxSales > 0 && (
+          <Card className="bg-gray-50 border-gray-200">
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-gray-900">Availability</h4>
+                  <span className={`font-medium text-sm px-3 py-1 rounded-full ${
+                    template.sales >= template.licenseId.maxSales 
+                      ? 'bg-red-100 text-red-800' 
+                      : template.sales >= template.licenseId.maxSales * 0.8 
+                        ? 'bg-orange-100 text-orange-800' 
+                        : 'bg-green-100 text-green-800'
+                  }`}>
+                    {template.sales >= template.licenseId.maxSales 
+                      ? 'Sold Out' 
+                      : `${template.licenseId.maxSales - template.sales}/${template.licenseId.maxSales} remaining`
+                    }
+                  </span>
+                </div>
+                
+                {/* Progress bar */}
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className={`h-3 rounded-full transition-all duration-300 ${
+                      template.sales >= template.licenseId.maxSales 
+                        ? 'bg-red-500' 
+                        : template.sales >= template.licenseId.maxSales * 0.8 
+                          ? 'bg-orange-500' 
+                          : 'bg-green-500'
+                    }`}
+                    style={{ 
+                      width: `${Math.min(100, (template.sales / template.licenseId.maxSales) * 100)}%` 
+                    }}
+                  />
+                </div>
+                
+                <p className="text-xs text-gray-600">
+                  {template.sales >= template.licenseId.maxSales 
+                    ? 'This template has reached its sales limit and is no longer available for purchase.'
+                    : template.sales >= template.licenseId.maxSales * 0.8 
+                      ? 'Limited availability - only a few copies remaining!'
+                      : 'This template is available for purchase.'
+                  }
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -247,11 +349,23 @@ export function TemplateInfo({ template, onAddToCart, addingToCart }: TemplateIn
         <Button
           size="lg"
           onClick={onAddToCart}
-          disabled={addingToCart}
-          className="w-full bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 text-lg font-semibold"
+          disabled={
+            addingToCart || 
+            !!(template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales)
+          }
+          className={`w-full px-8 py-4 text-lg font-semibold ${
+            template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales
+              ? 'bg-gray-400 cursor-not-allowed text-white'
+              : 'bg-primary-600 hover:bg-primary-700 text-white'
+          }`}
         >
           <IconShoppingCart className="w-5 h-5 mr-2" />
-          {addingToCart ? 'Adding to Cart...' : 'Add to Cart'}
+          {addingToCart 
+            ? 'Adding to Cart...' 
+            : (template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales)
+              ? 'Sold Out'
+              : 'Add to Cart'
+          }
         </Button>
         
         <div className="flex gap-2">
@@ -269,10 +383,16 @@ export function TemplateInfo({ template, onAddToCart, addingToCart }: TemplateIn
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
+            onClick={handleWishlistToggle}
+            disabled={isUpdatingWishlist}
+            className={`flex-1 ${isInWishlist ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100' : ''}`}
           >
-            <IconHeart className="w-4 h-4 mr-2" />
-            Wishlist
+            {isUpdatingWishlist ? (
+              <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+            ) : (
+              <IconHeart className={`w-4 h-4 mr-2 ${isInWishlist ? 'fill-current' : ''}`} />
+            )}
+            {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
           </Button>
           <Button
             variant="outline"
