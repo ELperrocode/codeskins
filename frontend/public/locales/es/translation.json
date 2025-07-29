@@ -164,7 +164,15 @@
       "alreadyAccount": "¿Ya tienes una cuenta?",
       "signIn": "Inicia sesión",
       "registerButton": "Crear Cuenta",
-      "registering": "Creando cuenta..."
+      "registering": "Creando cuenta...",
+      "usernameRequired": "El nombre de usuario es requerido",
+      "usernameMinLength": "El nombre de usuario debe tener al menos 3 caracteres",
+      "emailRequired": "El email es requerido",
+      "emailInvalid": "Por favor ingresa un email válido",
+      "passwordRequired": "La contraseña es requerida",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+      "confirmPasswordRequired": "Por favor confirma tu contraseña",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden"
     }
   },
   "dashboard": {

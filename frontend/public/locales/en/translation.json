@@ -164,7 +164,15 @@
       "alreadyAccount": "Already have an account?",
       "signIn": "Sign in",
       "registerButton": "Create Account",
-      "registering": "Creating account..."
+      "registering": "Creating account...",
+      "usernameRequired": "Username is required",
+      "usernameMinLength": "Username must be at least 3 characters",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match"
     }
   },
   "dashboard": {

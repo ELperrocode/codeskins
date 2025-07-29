@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '../../../lib/auth-context';
-import { useDictionary } from '../../../lib/hooks/useDictionary';
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -29,7 +29,7 @@ import { IconUser, IconMail, IconLock, IconArrowRight, IconEye, IconEyeOff } fro
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const { t } = useDictionary();
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const lang = params.lang as string;
@@ -49,27 +49,27 @@ export default function RegisterPage() {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.username.trim()) {
-      newErrors.username = t.auth.errors.usernameRequired;
+      newErrors.username = t('auth.register.usernameRequired');
     } else if (formData.username.length < 3) {
-      newErrors.username = t.auth.errors.usernameMinLength;
+      newErrors.username = t('auth.register.usernameMinLength');
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = t.auth.errors.emailRequired;
+      newErrors.email = t('auth.register.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = t.auth.errors.emailInvalid;
+      newErrors.email = t('auth.register.emailInvalid');
     }
 
     if (!formData.password) {
-      newErrors.password = t.auth.errors.passwordRequired;
+      newErrors.password = t('auth.register.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = t.auth.errors.passwordMinLength;
+      newErrors.password = t('auth.register.passwordMinLength');
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = t.auth.errors.confirmPasswordRequired;
+      newErrors.confirmPassword = t('auth.register.confirmPasswordRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t.auth.errors.passwordsDoNotMatch;
+      newErrors.confirmPassword = t('auth.register.passwordsDoNotMatch');
     }
 
     setErrors(newErrors);
@@ -132,12 +132,12 @@ export default function RegisterPage() {
             <CardHeader className="text-center">
               <AuthTitle>
                 <CardTitle className="text-3xl font-bold text-text-inverse">
-                  {t.auth.createAccount}
+                  {t('auth.register.title')}
                 </CardTitle>
               </AuthTitle>
               <AuthDescription>
                 <CardDescription className="text-lg text-white">
-                  {t.auth.joinDescription}
+                  {t('auth.register.subtitle')}
                 </CardDescription>
               </AuthDescription>
             </CardHeader>
@@ -147,7 +147,7 @@ export default function RegisterPage() {
                 <AuthInput delay={0}>
                   <div className="space-y-2">
                     <Label htmlFor="username" className="font-medium">
-                      {t.auth.username}
+                      {t('auth.register.username')}
                     </Label>
                     <div className="relative group">
                       <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
@@ -157,7 +157,7 @@ export default function RegisterPage() {
                         id="username"
                         name="username"
                         type="text"
-                        placeholder={t.auth.usernamePlaceholder}
+                        placeholder={t('auth.register.username')}
                         value={formData.username}
                         onChange={handleInputChange}
                         required
