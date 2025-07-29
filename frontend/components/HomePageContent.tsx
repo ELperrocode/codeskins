@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { getAllReviews } from '../lib/api';
+import Footer from './ui/Footer';
 import Link from 'next/link';
 import { HeroParallax } from './ui/hero-parallax';
 import { Button } from './ui/button';
@@ -384,6 +385,147 @@ export default function HomePageContent() {
           </div>
         </div>
       </section>
+    {/* CTA Section */}
+    <section className="relative z-10 py-20 px-4">
+      <div className="max-w-4xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            {t('landing.cta.title')}
+          </h2>
+          <p className="text-xl text-white/80 mb-8">
+            {t('landing.cta.subtitle')}
+          </p>
+          <Button
+            size="lg"
+            className="bg-gradient-primary hover:bg-gradient-primary-hover text-white font-semibold px-8 py-4 text-lg"
+            onClick={() => router.push(`/${lang}/templates`)}
+          >
+            <IconRocket className="w-5 h-5 mr-2" />
+            {t('landing.cta.button')}
+          </Button>
+        </motion.div>
+      </div>
+    </section>
+
+    {/* Footer Section - Integrated with landing page background */}
+    <footer className="relative z-10 border-t border-white/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          {/* Brand Section */}
+          <div className="lg:col-span-2">
+            <Link href={`/${lang}`} className="flex items-center space-x-2 mb-4 group">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <span className="text-white font-bold text-lg">C</span>
+              </div>
+              <span className="font-bold text-xl group-hover:text-primary-400 transition-colors duration-300 text-white drop-shadow-lg">CodeSkins</span>
+            </Link>
+            <p className="mb-6 max-w-md leading-relaxed text-white/70">
+              {t('footer.description')}
+            </p>
+            {/* Social Links */}
+            <div className="flex space-x-4">
+              {[
+                { name: 'GitHub', href: 'https://github.com', icon: IconBrandGithub },
+                { name: 'Twitter', href: 'https://twitter.com', icon: IconBrandTwitter },
+                { name: 'LinkedIn', href: 'https://linkedin.com', icon: IconBrandLinkedin },
+                { name: 'Email', href: 'mailto:contact@codeskins.com', icon: IconMail },
+              ].map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/60 hover:text-primary-400 hover:scale-110 transition-all duration-300 p-2 rounded-lg hover:bg-white/10"
+                  aria-label={social.name}
+                >
+                  <social.icon className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Links */}
+          <div>
+            <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">{t('footer.product')}</h3>
+            <ul className="space-y-2">
+              {[
+                { name: t('footer.templates'), href: `/${lang}/templates` },
+                { name: t('footer.categories'), href: `/${lang}/templates?category=all` },
+                { name: t('footer.newArrivals'), href: `/${lang}/templates?sort=newest` },
+                { name: t('footer.popular'), href: `/${lang}/templates?sort=popular` },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-white/70 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company Links */}
+          <div>
+            <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">{t('footer.company')}</h3>
+            <ul className="space-y-2">
+              {[
+                { name: t('footer.login'), href: `/${lang}/login` },
+                { name: t('footer.register'), href: `/${lang}/register` },
+                { name: t('footer.cart'), href: `/${lang}/cart` },
+                { name: t('footer.checkout'), href: `/${lang}/checkout` },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-white/70 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="border-t border-white/10 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            {/* Copyright */}
+            <div className="flex items-center space-x-2 text-white/70">
+              <span>&copy; {new Date().getFullYear()} CodeSkins. {t('footer.copyright')}</span>
+              <span className="hidden sm:inline text-white/40">•</span>
+              <span className="hidden sm:inline">{t('footer.madeWith')}</span>
+              <IconHeart className="w-4 h-4 text-red-400 animate-pulse" />
+              <span className="hidden sm:inline">{t('footer.forDevelopers')}</span>
+            </div>
+
+            {/* Legal Links */}
+            <div className="flex flex-wrap justify-center md:justify-end space-x-6">
+              {[
+                { name: t('footer.terms'), href: '#' },
+                { name: t('footer.privacy'), href: '#' },
+              ].map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-white/60 hover:text-white transition-colors duration-300 text-sm hover:underline"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
     </div>
   );
 }
