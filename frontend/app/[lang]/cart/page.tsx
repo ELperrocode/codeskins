@@ -183,8 +183,8 @@ export default function CartPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-12 pt-8">
             <div>
-              <h1 className="text-4xl font-bold text-secondary mb-3">Shopping Cart</h1>
-              <p className="text-secondary/70 text-lg">
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">Shopping Cart</h1>
+              <p className="text-gray-600 text-lg">
                 {cart?.items.length || 0} {cart?.items.length === 1 ? 'item' : 'items'} in your cart
               </p>
             </div>
