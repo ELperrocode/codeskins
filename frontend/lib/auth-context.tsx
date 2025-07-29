@@ -19,7 +19,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<{ success: boolean; user?: User }>;
   register: (username: string, email: string, password: string, role: 'customer' | 'admin') => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -44,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const checkAuth = async () => {
+    setLoading(true);
     try {
       const response = await getProfile();
       if (response.success && response.data?.user) {
@@ -59,21 +60,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<{ success: boolean; user?: User }> => {
     try {
       const response = await loginApi(username, password);
       if (response.success && response.data?.user) {
         setUser(response.data.user);
         showLoginSuccess(response.data.user.username);
-        return true;
+        return { success: true, user: response.data.user };
       } else {
         showLoginError(response.message || 'Login failed');
-        return false;
+        return { success: false };
       }
     } catch (error) {
       console.error('Login error:', error);
       handleNetworkError(error, 'Login failed');
-      return false;
+      return { success: false };
     }
   };
 

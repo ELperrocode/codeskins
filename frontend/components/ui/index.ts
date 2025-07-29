@@ -17,7 +17,30 @@ export {
 } from './select';
 export { default as Navbar } from './Navbar';
 export { default as Footer } from './Footer';
+export { default as FooterWrapper } from './FooterWrapper';
 export { Pagination } from './pagination';
 export { PaginationInfo } from './pagination-info';
 export { PaginationWrapper } from './pagination-wrapper';
-export { TemplateSkeleton } from './template-skeleton'; 
+export { TemplateSkeleton } from './template-skeleton';
+// Auth animations
+export {
+  AuthContainer,
+  AuthCard,
+  AuthInput,
+  AuthButton,
+  AuthLink,
+  AuthIcon,
+  AuthError,
+  AuthSpinner,
+  AuthTitle,
+  AuthDescription,
+  AuthToggleButton,
+  AuthBackground
+} from './auth-animations';
+
+// Floating particles and background effects
+export {
+  FloatingParticles,
+  BackgroundWaves,
+  ConnectionLines
+} from './floating-particles'; 

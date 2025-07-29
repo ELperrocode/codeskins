@@ -44,6 +44,7 @@ interface Template {
   tags: string[];
   fileUrl: string;
   previewImages?: string[];
+  previewUrl?: string;
   features: string[];
   status: 'active' | 'inactive' | 'draft';
   downloads: number;
@@ -53,9 +54,8 @@ interface Template {
   licenseId?: {
     _id: string;
     name: string;
-    maxDownloads: number;
+    price: number;
   };
-  maxDownloads?: number;
   ownerId: {
     _id: string;
     username: string;
@@ -93,7 +93,8 @@ async function apiRequest<T>(
   };
 
   // Only add Content-Type header if there's a body or if it's not a DELETE request
-  if (options.body || options.method !== 'DELETE') {
+  // Special case: don't add Content-Type for logout endpoint
+  if ((options.body || options.method !== 'DELETE') && !endpoint.includes('/api/auth/logout')) {
     defaultOptions.headers = {
       'Content-Type': 'application/json',
       ...defaultOptions.headers,
@@ -102,12 +103,20 @@ async function apiRequest<T>(
 
   try {
     const response = await fetch(url, defaultOptions);
-    const data = await response.json();
     
     if (!response.ok) {
-      throw new Error(data.message || 'API request failed');
+      let errorMessage = 'API request failed';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (jsonError) {
+        // If response is not JSON, use status text
+        errorMessage = response.statusText || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
     
+    const data = await response.json();
     return data;
   } catch (error) {
     console.error('API request error:', error);
@@ -166,12 +175,21 @@ export const getTemplates = async (params?: {
   return apiRequest<{ templates: Template[]; pagination: any }>(endpoint);
 };
 
+// Función específica para el admin que obtiene todos los templates
+export const getAllTemplatesForAdmin = async (): Promise<ApiResponse<{ templates: Template[] }>> => {
+  return apiRequest<{ templates: Template[] }>('/api/templates?limit=1000&status=all');
+};
+
 export const getTemplate = async (id: string): Promise<ApiResponse<{ template: Template }>> => {
   return apiRequest<{ template: Template }>(`/api/templates/${id}`);
 };
 
 export const getTemplateCategories = async (): Promise<ApiResponse<{ categories: string[] }>> => {
   return apiRequest<{ categories: string[] }>('/api/templates/categories');
+};
+
+export const getCategoriesWithImages = async (): Promise<ApiResponse<{ categories: Array<{ _id: string; name: string; description?: string; imageUrl?: string; templateCount: number; isActive: boolean }> }>> => {
+  return apiRequest<{ categories: Array<{ _id: string; name: string; description?: string; imageUrl?: string; templateCount: number; isActive: boolean }> }>('/api/categories?active=true');
 };
 
 export const getTemplateTags = async (): Promise<ApiResponse<{ tags: string[] }>> => {
@@ -185,11 +203,11 @@ export const createTemplate = async (data: {
   price: number;
   tags?: string[];
   fileUrl: string;
-  previewImage?: string;
+  previewUrl?: string;
+  previewImages?: string[];
   features?: string[];
   status?: 'active' | 'inactive' | 'draft';
   licenseId?: string;
-  maxDownloads?: number;
 }): Promise<ApiResponse<{ template: Template }>> => {
   return apiRequest<{ template: Template }>('/api/templates', {
     method: 'POST',
@@ -204,11 +222,11 @@ export const updateTemplate = async (id: string, data: {
   price?: number;
   tags?: string[];
   fileUrl?: string;
+  previewUrl?: string;
   previewImages?: string[];
   features?: string[];
   status?: 'active' | 'inactive' | 'draft';
   licenseId?: string;
-  maxDownloads?: number;
 }): Promise<ApiResponse<{ template: Template }>> => {
   return apiRequest<{ template: Template }>(`/api/templates/${id}`, {
     method: 'PUT',
@@ -360,6 +378,7 @@ export const getCategory = async (id: string): Promise<ApiResponse<{ category: a
 export const createCategory = async (data: {
   name: string;
   description?: string;
+  imageUrl?: string;
 }): Promise<ApiResponse<{ category: any }>> => {
   return apiRequest<{ category: any }>('/api/categories', {
     method: 'POST',
@@ -371,6 +390,7 @@ export const updateCategory = async (id: string, data: {
   name?: string;
   description?: string;
   isActive?: boolean;
+  imageUrl?: string;
 }): Promise<ApiResponse<{ category: any }>> => {
   return apiRequest<{ category: any }>(`/api/categories/${id}`, {
     method: 'PUT',
@@ -458,7 +478,8 @@ export const getLicense = async (id: string): Promise<ApiResponse<{ license: any
 export const createLicense = async (data: {
   name: string;
   description: string;
-  maxDownloads: number;
+  price: number;
+  maxSales?: number;
 }): Promise<ApiResponse<{ license: any }>> => {
   return apiRequest<{ license: any }>('/api/licenses', {
     method: 'POST',
@@ -469,7 +490,8 @@ export const createLicense = async (data: {
 export const updateLicense = async (id: string, data: {
   name?: string;
   description?: string;
-  maxDownloads?: number;
+  price?: number;
+  maxSales?: number;
   isActive?: boolean;
 }): Promise<ApiResponse<{ license: any }>> => {
   return apiRequest<{ license: any }>(`/api/licenses/${id}`, {
@@ -485,45 +507,7 @@ export const deleteLicense = async (id: string): Promise<ApiResponse<{ message: 
 };
 
 // Downloads API
-export const downloadTemplate = async (data: {
-  templateId: string;
-  licenseId: string;
-}): Promise<ApiResponse<{
-  downloadCount: number;
-  maxDownloads: number;
-  remainingDownloads: number;
-  downloadUrl: string;
-}>> => {
-  return apiRequest<{
-    downloadCount: number;
-    maxDownloads: number;
-    remainingDownloads: number;
-    downloadUrl: string;
-  }>('/api/downloads', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-};
 
-export const getDownloadHistory = async (): Promise<ApiResponse<{ downloads: any[] }>> => {
-  return apiRequest<{ downloads: any[] }>('/api/downloads/history');
-};
-
-export const getDownloadStatus = async (templateId: string, licenseId: string): Promise<ApiResponse<{
-  downloadCount: number;
-  maxDownloads: number;
-  remainingDownloads: number;
-  canDownload: boolean;
-  licenseName: string;
-}>> => {
-  return apiRequest<{
-    downloadCount: number;
-    maxDownloads: number;
-    remainingDownloads: number;
-    canDownload: boolean;
-    licenseName: string;
-  }>(`/api/downloads/status?templateId=${templateId}&licenseId=${licenseId}`);
-};
 
 // Reviews API
 export const getReviews = async (templateId: string, params?: {
