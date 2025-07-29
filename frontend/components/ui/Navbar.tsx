@@ -7,6 +7,7 @@ import { Button } from './button';
 import { IconMenu2, IconX, IconShoppingCart, IconUser } from '@tabler/icons-react';
 import { useAuth } from '../../lib/auth-context';
 import { useCart } from '../../lib/cart-context';
+import { useTranslation } from '../../lib/hooks/useTranslation';
 
 interface NavbarProps {
   isScrollable?: boolean;
@@ -20,6 +21,7 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
   const lang = params.lang as string;
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
+  const { t } = useTranslation();
 
   // Handle scroll effect only if isScrollable is true
   useEffect(() => {
@@ -47,11 +49,12 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
   };
 
   const navigation = [
-    { name: 'Templates', href: `/${lang}/templates` },
+    { name: t('navigation.templates'), href: `/${lang}/templates` },
+    { name: t('navigation.about'), href: `/${lang}/about` },
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <nav className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
       isScrollable && isScrolled 
         ? 'bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-lg' 
         : isScrollable 

@@ -7,6 +7,7 @@ import {
   useSpring,
   MotionValue,
 } from "motion/react";
+import { useTranslation } from '../../lib/hooks/useTranslation';
 
 // Function to generate gradient based on title
 const getGradientForTitle = (title: string) => {
@@ -37,6 +38,7 @@ export const HeroParallax = ({
     thumbnail: string;
   }[];
 }) => {
+  const { t } = useTranslation();
   const firstRow = products.slice(0, 5);
   const secondRow = products.slice(5, 10);
   const thirdRow = products.slice(10, 15);
@@ -75,8 +77,32 @@ export const HeroParallax = ({
   return (
     <div
       ref={ref}
-      className="h-[300vh] py-40 overflow-hidden  antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]"
+      className="h-[300vh] py-40 overflow-hidden antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]"
     >
+      {/* Hero Text Overlay - Fixed Position */}
+      <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+        <div className="text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="text-6xl md:text-8xl font-bold text-white mb-6"
+          >
+            <span className="bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent">
+              {t('hero.title')}
+            </span>
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto"
+          >
+            {t('hero.subtitle')}
+          </motion.p>
+        </div>
+      </div>
+
       <motion.div
         style={{
           rotateX,

@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
+import { useTranslation } from '../lib/hooks/useTranslation';
 
 const supportedLanguages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -12,8 +13,12 @@ export function LanguageSelector() {
   const params = useParams();
   const router = useRouter();
   const currentLang = params.lang as string;
+  const { changeLanguage } = useTranslation();
 
   const handleLanguageChange = (langCode: string) => {
+    // Change the i18n language
+    changeLanguage(langCode);
+    
     // Get the current path and replace the language part
     const currentPath = window.location.pathname;
     const pathWithoutLang = currentPath.replace(`/${currentLang}`, '');

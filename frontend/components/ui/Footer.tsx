@@ -3,31 +3,27 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconMail, IconHeart } from '@tabler/icons-react';
+import { useTranslation } from '../../lib/hooks/useTranslation';
 
-export default function Footer() {
+interface FooterProps {
+  isTransparent?: boolean;
+}
+
+export default function Footer({ isTransparent = false }: FooterProps) {
   const params = useParams();
   const lang = params.lang as string;
+  const { t } = useTranslation();
 
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
     product: [
-      { name: 'Templates', href: `/${lang}/templates` },
-      { name: 'Categories', href: `/${lang}/templates?category=all` },
-      { name: 'New Arrivals', href: `/${lang}/templates?sort=newest` },
-      { name: 'Popular', href: `/${lang}/templates?sort=popular` },
-    ],
-    company: [
-      { name: 'Login', href: `/${lang}/login` },
-      { name: 'Register', href: `/${lang}/register` },
-    ],
-    support: [
-      { name: 'Cart', href: `/${lang}/cart` },
-      { name: 'Checkout', href: `/${lang}/checkout` },
+      { name: t('navigation.templates'), href: `/${lang}/templates` },
+      { name: t('navigation.about'), href: `/${lang}/about` },
     ],
     legal: [
-      { name: 'Terms of Service', href: '#' },
-      { name: 'Privacy Policy', href: '#' },
+      { name: t('footer.termsOfService'), href: '#' },
+      { name: t('footer.privacyPolicy'), href: '#' },
     ],
   };
 
@@ -39,21 +35,28 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-black border-t border-white/10">
+    <footer className={`transition-all duration-300 ${
+      isTransparent 
+        ? 'bg-transparent border-transparent' 
+        : 'bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-lg'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <Link href={`/${lang}`} className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+            <Link href={`/${lang}`} className="flex items-center space-x-2 mb-4 group">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <span className="text-white font-bold text-lg">C</span>
               </div>
-              <span className="text-white font-bold text-xl">CodeSkins</span>
+              <span className={`font-bold text-xl group-hover:text-primary-400 transition-colors duration-300 ${
+                isTransparent ? 'text-white drop-shadow-lg' : 'text-gray-900'
+              }`}>CodeSkins</span>
             </Link>
-            <p className="text-white/60 mb-6 max-w-md">
-              Premium website templates and components for modern web development. 
-              Built with the latest technologies and designed for developers who care about quality.
+            <p className={`mb-6 max-w-md leading-relaxed ${
+              isTransparent ? 'text-white/70' : 'text-gray-600'
+            }`}>
+              {t('footer.description')}
             </p>
             
             {/* Social Links */}
@@ -64,7 +67,11 @@ export default function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white/60 hover:text-white transition-colors duration-200"
+                  className={`hover:text-primary-400 hover:scale-110 transition-all duration-300 p-2 rounded-lg ${
+                    isTransparent 
+                      ? 'text-white/60 hover:bg-white/10' 
+                      : 'text-gray-500 hover:bg-gray-100'
+                  }`}
                   aria-label={social.name}
                 >
                   <social.icon className="w-5 h-5" />
@@ -75,47 +82,17 @@ export default function Footer() {
 
           {/* Product Links */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Product</h3>
+            <h3 className={`font-semibold mb-4 text-lg ${
+              isTransparent ? 'text-white drop-shadow-sm' : 'text-gray-900'
+            }`}>{t('footer.links')}</h3>
             <ul className="space-y-2">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-white/60 hover:text-white transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Company</h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-white transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Support Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Support</h3>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-white transition-colors duration-200"
+                    className={`hover:text-primary-400 transition-colors duration-300 hover:translate-x-1 inline-block ${
+                      isTransparent ? 'text-white/70 hover:text-white' : 'text-gray-600'
+                    }`}
                   >
                     {link.name}
                   </Link>
@@ -126,15 +103,21 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-white/10 pt-8">
+        <div className={`border-t pt-8 ${
+          isTransparent ? 'border-white/10' : 'border-gray-200'
+        }`}>
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
-            <div className="flex items-center space-x-2 text-white/60">
-              <span>&copy; {currentYear} CodeSkins. All rights reserved.</span>
-              <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">Made with</span>
-              <IconHeart className="w-4 h-4 text-red-500" />
-              <span className="hidden sm:inline">for developers</span>
+            <div className={`flex items-center space-x-2 ${
+              isTransparent ? 'text-white/70' : 'text-gray-600'
+            }`}>
+              <span>&copy; {currentYear} CodeSkins. {t('footer.allRightsReserved')}</span>
+              <span className={`hidden sm:inline ${
+                isTransparent ? 'text-white/40' : 'text-gray-400'
+              }`}>•</span>
+              <span className="hidden sm:inline">{t('footer.madeWith')}</span>
+              <IconHeart className="w-4 h-4 text-red-400 animate-pulse" />
+              <span className="hidden sm:inline">{t('footer.forDevelopers')}</span>
             </div>
 
             {/* Legal Links */}
@@ -143,7 +126,9 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="text-white/60 hover:text-white transition-colors duration-200 text-sm"
+                  className={`hover:text-primary-400 transition-colors duration-300 text-sm hover:underline ${
+                    isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-600'
+                  }`}
                 >
                   {link.name}
                 </Link>

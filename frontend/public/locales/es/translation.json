@@ -1,0 +1,269 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "remove": "Quitar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "clear": "Limpiar",
+    "view": "Ver",
+    "download": "Descargar",
+    "preview": "Vista previa",
+    "quantity": "Cantidad",
+    "price": "Precio",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Impuestos",
+    "shipping": "Envío",
+    "discount": "Descuento",
+    "currency": "USD",
+    "fixed": "Fijo"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "templates": "Plantillas",
+    "about": "Acerca de",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "dashboard": "Panel",
+    "cart": "Carrito",
+    "profile": "Perfil",
+    "admin": "Administrador",
+    "customer": "Cliente"
+  },
+  "hero": {
+    "title": "CodeSkins",
+    "subtitle": "Plantillas web premium para desarrolladores y empresas",
+    "browseTemplates": "Explorar Plantillas",
+    "viewCategories": "Ver Categorías"
+  },
+  "templates": {
+    "title": "Plantillas",
+    "subtitle": "Plantillas web profesionales para tu próximo proyecto",
+    "filters": {
+      "title": "Filtros",
+      "category": "Categoría",
+      "priceRange": "Rango de Precio",
+      "tags": "Etiquetas",
+      "sortBy": "Ordenar Por",
+      "newest": "Más Recientes",
+      "oldest": "Más Antiguas",
+      "priceLow": "Precio: Menor a Mayor",
+      "priceHigh": "Precio: Mayor a Menor",
+      "popular": "Más Populares",
+      "rating": "Mejor Valoradas"
+    },
+    "results": {
+      "showing": "Mostrando",
+      "of": "de",
+      "templates": "plantillas",
+      "noResults": "No se encontraron plantillas",
+      "clearFilters": "Limpiar todos los filtros"
+    },
+    "card": {
+      "addToCart": "Agregar al Carrito",
+      "soldOut": "Agotado",
+      "viewDetails": "Ver Detalles",
+      "livePreview": "Vista Previa",
+      "by": "por",
+      "availability": "Disponibilidad",
+      "remaining": "restantes",
+      "features": "Características",
+      "more": "más"
+    },
+    "detail": {
+      "description": "Descripción",
+      "features": "Características",
+      "reviews": "Reseñas",
+      "related": "Plantillas Relacionadas",
+      "license": "Licencia",
+      "includes": "incluye descargas ilimitadas",
+      "addToWishlist": "Agregar a Favoritos",
+      "removeFromWishlist": "Quitar de Favoritos",
+      "share": "Compartir",
+      "download": "Descargar Plantilla",
+      "preview": "Vista Previa",
+      "owner": "Creado por",
+      "category": "Categoría",
+      "tags": "Etiquetas",
+      "created": "Creado",
+      "downloads": "Descargas",
+      "sales": "Ventas",
+      "rating": "Valoración",
+      "reviews": "Reseñas"
+    }
+  },
+  "cart": {
+    "title": "Carrito de Compras",
+    "empty": "Tu carrito está vacío",
+    "emptyMessage": "Comienza a comprar para agregar plantillas a tu carrito",
+    "browseTemplates": "Explorar Plantillas",
+    "item": "artículo",
+    "items": "artículos",
+    "quantity": "Cantidad",
+    "fixed": "Fijo",
+    "remove": "Quitar",
+    "clearCart": "Vaciar Carrito",
+    "proceedToCheckout": "Proceder al Pago",
+    "orderSummary": "Resumen del Pedido",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "checkout": "Pagar"
+  },
+  "checkout": {
+    "title": "Pago",
+    "orderSummary": "Resumen del Pedido",
+    "paymentMethod": "Método de Pago",
+    "card": "Tarjeta",
+    "paypal": "PayPal",
+    "completeOrder": "Completar Pedido",
+    "processing": "Procesando...",
+    "success": "¡Pago Exitoso!",
+    "successMessage": "Tu pedido se ha completado exitosamente. Ya puedes descargar tus plantillas.",
+    "error": "Pago Fallido",
+    "errorMessage": "Hubo un error procesando tu pago. Por favor intenta de nuevo.",
+    "cancel": "Pago Cancelado",
+    "cancelMessage": "Tu pago fue cancelado. Puedes intentar de nuevo o regresar a tu carrito."
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "subtitle": "¡Bienvenido de vuelta! Por favor ingresa tus detalles.",
+      "username": "Usuario",
+      "password": "Contraseña",
+      "rememberMe": "Recordarme",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUp": "Regístrate",
+      "loginButton": "Iniciar Sesión",
+      "loggingIn": "Iniciando sesión..."
+    },
+    "register": {
+      "title": "Crear Cuenta",
+      "subtitle": "Únete a CodeSkins y comienza a construir sitios web increíbles.",
+      "username": "Usuario",
+      "email": "Correo",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "agreeTerms": "Acepto los términos y condiciones",
+      "alreadyAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Inicia sesión",
+      "registerButton": "Crear Cuenta",
+      "registering": "Creando cuenta..."
+    }
+  },
+  "dashboard": {
+    "admin": {
+      "title": "Panel de Administrador",
+      "overview": "Resumen",
+      "analytics": "Analíticas",
+      "templates": "Plantillas",
+      "categories": "Categorías",
+      "tags": "Etiquetas",
+      "licenses": "Licencias",
+      "orders": "Pedidos",
+      "users": "Usuarios",
+      "stats": {
+        "totalSales": "Ventas Totales",
+        "totalOrders": "Pedidos Totales",
+        "totalUsers": "Usuarios Totales",
+        "totalTemplates": "Plantillas Totales",
+        "recentOrders": "Pedidos Recientes",
+        "topTemplates": "Mejores Plantillas",
+        "monthlySales": "Ventas Mensuales"
+      }
+    },
+    "customer": {
+      "title": "Mi Panel",
+      "overview": "Resumen",
+      "purchases": "Mis Compras",
+      "favorites": "Favoritos",
+      "downloads": "Descargas",
+      "profile": "Perfil",
+      "stats": {
+        "totalSpent": "Total Gastado",
+        "totalOrders": "Total de Pedidos",
+        "recentOrders": "Pedidos Recientes",
+        "favoriteCategories": "Categorías Favoritas"
+      }
+    }
+  },
+  "about": {
+    "title": "Acerca de CodeSkins",
+    "subtitle": "Somos apasionados por ayudar a desarrolladores y empresas a crear sitios web impresionantes de manera rápida y eficiente.",
+    "mission": "Nuestra Misión",
+    "missionText": "En CodeSkins, creemos que cada desarrollador merece acceso a plantillas web de alta calidad y profesionales que puedan acelerar su proceso de desarrollo. Nuestra misión es proporcionar las mejores plantillas web que combinen diseño moderno con código limpio y mantenible.",
+    "missionText2": "Ya sea que estés construyendo un portafolio, lanzando una startup o creando un sitio web corporativo, nuestras plantillas están diseñadas para ayudarte a tener éxito. Estamos comprometidos con la mejora continua y mantenernos actualizados con las últimas tendencias y tecnologías de desarrollo web.",
+    "features": {
+      "title": "¿Por qué elegir CodeSkins?",
+      "subtitle": "Proporcionamos todo lo que necesitas para crear sitios web impresionantes de manera rápida y eficiente.",
+      "modernDevelopment": {
+        "title": "Desarrollo Moderno",
+        "description": "Construido con las últimas tecnologías incluyendo React, Next.js y TypeScript para un rendimiento y experiencia de desarrollador óptimos."
+      },
+      "beautifulDesign": {
+        "title": "Diseño Hermoso",
+        "description": "Plantillas cuidadosamente elaboradas con principios modernos de UI/UX, asegurando que tus proyectos se vean profesionales y atractivos."
+      },
+      "fastResponsive": {
+        "title": "Rápido y Responsivo",
+        "description": "Optimizado para velocidad y diseño mobile-first, asegurando que tus sitios web funcionen perfectamente en todos los dispositivos."
+      },
+      "communityDriven": {
+        "title": "Impulsado por la Comunidad",
+        "description": "Construido por desarrolladores, para desarrolladores. Nuestras plantillas están diseñadas pensando en casos de uso del mundo real."
+      }
+    },
+    "contact": {
+      "title": "Ponte en Contacto",
+      "subtitle": "¿Tienes preguntas o sugerencias? ¡Nos encantaría escucharte!"
+    },
+    "stats": {
+      "templates": "Plantillas",
+      "downloads": "Descargas",
+      "rating": "Valoración",
+      "support": "Soporte"
+    }
+  },
+  "footer": {
+    "description": "Plantillas web premium y componentes para desarrollo web moderno. Construido con las últimas tecnologías y diseñado para desarrolladores que se preocupan por la calidad.",
+    "links": "Enlaces",
+    "madeWith": "Hecho con",
+    "forDevelopers": "para desarrolladores",
+    "allRightsReserved": "Todos los derechos reservados.",
+    "termsOfService": "Términos de Servicio",
+    "privacyPolicy": "Política de Privacidad"
+  },
+  "notifications": {
+    "addedToCart": "Agregado al carrito exitosamente",
+    "removedFromCart": "Quitado del carrito",
+    "cartUpdated": "Carrito actualizado",
+    "addedToFavorites": "Agregado a favoritos",
+    "removedFromFavorites": "Quitado de favoritos",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "loginError": "Error al iniciar sesión",
+    "registerSuccess": "Cuenta creada exitosamente",
+    "registerError": "Error en el registro",
+    "logoutSuccess": "Sesión cerrada exitosamente",
+    "downloadSuccess": "Descarga iniciada",
+    "downloadError": "Error en la descarga",
+    "paymentSuccess": "Pago exitoso",
+    "paymentError": "Error en el pago",
+    "templateCreated": "Plantilla creada exitosamente",
+    "templateUpdated": "Plantilla actualizada exitosamente",
+    "templateDeleted": "Plantilla eliminada exitosamente",
+    "templateError": "Error en la operación de plantilla"
+  }
+} 
