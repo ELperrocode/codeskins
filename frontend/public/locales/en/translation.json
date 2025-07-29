@@ -103,6 +103,28 @@
       "sales": "Sales",
       "rating": "Rating",
       "reviews": "Reviews"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Download {{template}} and start building your next project today. Get instant access to the complete source code and documentation.",
+      "benefits": {
+        "instantDownload": {
+          "title": "Instant Download",
+          "description": "Get access immediately after purchase"
+        },
+        "securePayment": {
+          "title": "Secure Payment",
+          "description": "SSL encrypted transactions"
+        },
+        "lifetimeUpdates": {
+          "title": "Lifetime Updates",
+          "description": "Free updates for life"
+        },
+        "support": {
+          "title": "24/7 Support",
+          "description": "Get help whenever you need it"
+        }
+      }
     }
   },
   "cart": {

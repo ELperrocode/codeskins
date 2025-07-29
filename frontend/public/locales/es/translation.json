@@ -103,6 +103,28 @@
       "sales": "Ventas",
       "rating": "Valoración",
       "reviews": "Reseñas"
+    },
+    "cta": {
+      "title": "¿Listo para Comenzar?",
+      "description": "Descarga {{template}} y comienza a construir tu próximo proyecto hoy. Obtén acceso instantáneo al código fuente completo y documentación.",
+      "benefits": {
+        "instantDownload": {
+          "title": "Descarga Instantánea",
+          "description": "Obtén acceso inmediatamente después de la compra"
+        },
+        "securePayment": {
+          "title": "Pago Seguro",
+          "description": "Transacciones encriptadas con SSL"
+        },
+        "lifetimeUpdates": {
+          "title": "Actualizaciones de por Vida",
+          "description": "Actualizaciones gratuitas de por vida"
+        },
+        "support": {
+          "title": "Soporte 24/7",
+          "description": "Obtén ayuda cuando la necesites"
+        }
+      }
     }
   },
   "cart": {
