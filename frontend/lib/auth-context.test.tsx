@@ -22,7 +22,7 @@ const TestComponent = () => {
       <button onClick={() => login('test@example.com', 'password')} data-testid="login-btn">
         Login
       </button>
-      <button onClick={() => register('test@example.com', 'password', 'customer')} data-testid="register-btn">
+      <button onClick={() => register('testuser', 'test@example.com', 'password', 'customer')} data-testid="register-btn">
         Register
       </button>
       <button onClick={logout} data-testid="logout-btn">
@@ -95,7 +95,7 @@ describe('AuthContext', () => {
       expect(screen.getByTestId('user-role')).toHaveTextContent('customer');
     });
     
-    expect(mockRegister).toHaveBeenCalledWith('test@example.com', 'password', 'customer');
+    expect(mockRegister).toHaveBeenCalledWith('testuser', 'test@example.com', 'password', 'customer');
   });
 
   it('should handle logout', async () => {
@@ -137,11 +137,11 @@ describe('AuthContext', () => {
     mockGetProfile.mockResolvedValue({
       success: true,
       data: {
-        user: { email: 'saved@example.com', role: 'seller' }
+        user: { email: 'saved@example.com', role: 'admin' }
       }
     });
 
-    const mockUser = { email: 'saved@example.com', role: 'seller' };
+          const mockUser = { email: 'saved@example.com', role: 'admin' };
     localStorage.setItem('user', JSON.stringify(mockUser));
     localStorage.setItem('token', 'saved-token');
 
@@ -149,7 +149,7 @@ describe('AuthContext', () => {
     
     await waitFor(() => {
       expect(screen.getByTestId('user-email')).toHaveTextContent('saved@example.com');
-      expect(screen.getByTestId('user-role')).toHaveTextContent('seller');
+      expect(screen.getByTestId('user-role')).toHaveTextContent('admin');
     });
   });
 }); 

@@ -17,15 +17,11 @@ describe('Authentication Endpoints', () => {
     await app.close();
   });
 
-  beforeEach(async () => {
-    await User.deleteMany({});
-  });
-
   describe('POST /api/auth/register', () => {
     it('should register a new user successfully', async () => {
       const userData = {
-        username: 'testuser',
-        email: 'test@example.com',
+        username: 'testuser1',
+        email: 'test1@example.com',
         password: 'password123',
         role: 'customer',
       };
@@ -48,8 +44,8 @@ describe('Authentication Endpoints', () => {
 
     it('should not register user with existing username', async () => {
       const userData = {
-        username: 'testuser',
-        email: 'test@example.com',
+        username: 'testuser2',
+        email: 'test2@example.com',
         password: 'password123',
         role: 'customer',
       };
@@ -80,7 +76,7 @@ describe('Authentication Endpoints', () => {
       const response = await request(app.server)
         .post('/api/auth/register')
         .send({
-          username: 'testuser',
+          username: 'testuser3',
           password: '123',
         })
         .expect(400);
@@ -93,8 +89,8 @@ describe('Authentication Endpoints', () => {
     beforeEach(async () => {
       // Create a test user
       await User.create({
-        username: 'testuser',
-        email: 'test@example.com',
+        username: 'testuser4',
+        email: 'test4@example.com',
         password: 'password123',
         role: 'customer',
         isActive: true,
@@ -105,14 +101,14 @@ describe('Authentication Endpoints', () => {
       const response = await agent
         .post('/api/auth/login')
         .send({
-          username: 'testuser',
+          username: 'testuser4',
           password: 'password123',
         })
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Login successful');
-      expect(response.body.data.user.username).toBe('testuser');
+      expect(response.body.data.user.username).toBe('testuser4');
       // Check for session cookie
       const cookieHeader = response.headers['set-cookie'];
       expect(cookieHeader).toBeDefined();
@@ -127,7 +123,7 @@ describe('Authentication Endpoints', () => {
       const response = await request(app.server)
         .post('/api/auth/login')
         .send({
-          username: 'testuser',
+          username: 'testuser4',
           password: 'wrongpassword',
         })
         .expect(401);
@@ -151,14 +147,14 @@ describe('Authentication Endpoints', () => {
 
     it('should not login deactivated user', async () => {
       await User.findOneAndUpdate(
-        { username: 'testuser' },
+        { username: 'testuser4' },
         { isActive: false },
       );
 
       const response = await request(app.server)
         .post('/api/auth/login')
         .send({
-          username: 'testuser',
+          username: 'testuser4',
           password: 'password123',
         })
         .expect(403);
@@ -172,15 +168,15 @@ describe('Authentication Endpoints', () => {
     beforeEach(async () => {
       // Create and log in a user to establish a session
       await User.create({
-        username: 'testuser',
-        email: 'test@example.com',
+        username: 'testuser5',
+        email: 'test5@example.com',
         password: 'password123',
         role: 'customer',
         isActive: true,
       });
 
       await agent.post('/api/auth/login').send({
-        username: 'testuser',
+        username: 'testuser5',
         password: 'password123',
       });
     });
@@ -190,7 +186,7 @@ describe('Authentication Endpoints', () => {
         const response = await agent.get('/api/auth/me').expect(200);
 
         expect(response.body.success).toBe(true);
-        expect(response.body.data.user.username).toBe('testuser');
+        expect(response.body.data.user.username).toBe('testuser5');
         expect(response.body.data.user.role).toBe('customer');
         expect(response.body.data.user.password).toBeUndefined();
       });
