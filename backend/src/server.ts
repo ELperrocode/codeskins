@@ -1,92 +1,139 @@
-import Fastify, { FastifyInstance } from 'fastify'
-import cors from '@fastify/cors'
-import helmet from '@fastify/helmet'
-import secureSession from '@fastify/secure-session'
-import fastifyPassport from '@fastify/passport'
-import fs from 'fs'
-import path from 'path'
+import 'dotenv/config'
 import { config } from 'dotenv'
-import { connectDatabase, disconnectDatabase } from './config/database'
-import { registerRoutes } from './routes'
-import { authenticate } from './middleware/auth'
-import './config/passport' // Import passport configuration
+import path from 'path'
 
-// Load environment variables
-config()
+// Load .env.local if it exists
+config({ path: path.join(__dirname, '../.env.local') })
+import Fastify from 'fastify'
+import cors from '@fastify/cors'
+import session from '@fastify/secure-session'
+import staticFiles from '@fastify/static'
+import passport from 'passport'
+import { Strategy as LocalStrategy } from 'passport-local'
+import { connectDatabase } from './config/database'
+import { registerRoutes } from './routes/index'
+import { User } from './models/User'
 
-// Define a key for the session
-const sessionKeyPath = path.join(__dirname, 'session-key.txt')
-let sessionKey: Buffer
-
-if (process.env['SESSION_KEY']) {
-  sessionKey = Buffer.from(process.env['SESSION_KEY'], 'hex')
-} else if (fs.existsSync(sessionKeyPath)) {
-  sessionKey = Buffer.from(fs.readFileSync(sessionKeyPath, 'utf8'), 'hex')
-} else {
-  sessionKey = require('crypto').randomBytes(32)
-  fs.writeFileSync(sessionKeyPath, sessionKey.toString('hex'))
-}
-
-
-export const build = async (): Promise<FastifyInstance> => {
+export const build = async () => {
   const fastify = Fastify({
-    logger: process.env['NODE_ENV'] !== 'test',
-    trustProxy: true,
+    logger: {
+      level: process.env['LOG_LEVEL'] || 'info',
+    },
+    bodyLimit: 10485760, // 10MB
   })
 
   // Register plugins
   await fastify.register(cors, {
     origin: process.env['FRONTEND_URL'] || 'http://localhost:3000',
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Set-Cookie']
   })
 
-  await fastify.register(helmet)
-
-  await fastify.register(secureSession, {
-    key: sessionKey,
+  await fastify.register(session, {
+    secret: process.env['SESSION_SECRET'] || 'your-secret-key',
     cookie: {
       path: '/',
       httpOnly: true,
       secure: process.env['NODE_ENV'] === 'production',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
+  } as any)
+
+  // Serve static files from uploads directory
+  await fastify.register(staticFiles, {
+    root: path.join(__dirname, '../uploads'),
+    prefix: '/uploads/',
   })
 
   // Initialize Passport
-  await fastify.register(fastifyPassport.initialize())
-  await fastify.register(fastifyPassport.secureSession())
-
-  // Add authenticate middleware to fastify instance
-  fastify.decorate('authenticate', authenticate)
-
-  // Register routes
-  await registerRoutes(fastify)
-
-  // Connect to database
-  await connectDatabase()
-
-  // Disconnect from database on close
-  fastify.addHook('onClose', async () => {
-    await disconnectDatabase()
+  fastify.addHook('preHandler', (request, _reply, next) => {
+    request.session = request.session || {}
+    next()
   })
 
-  // Error handler
-  fastify.setErrorHandler((error, _request, reply) => {
-    fastify.log.error(error)
+  // Add raw body for webhooks
+  fastify.addHook('preHandler', async (request, _reply) => {
+    if (request.url === '/api/stripe/webhook') {
+      // For now, we'll handle webhook verification differently
+      ;(request as any).isWebhook = true
+    }
+  })
 
-    if (error.validation) {
-      return reply.status(400).send({
-        error: 'Validation Error',
-        message: error.message,
-        details: error.validation,
+  // Configure Passport Local Strategy
+  passport.use(
+    new LocalStrategy(
+      {
+        usernameField: 'username',
+        passwordField: 'password',
+      },
+      async (username, password, done) => {
+        try {
+          const user = await User.findOne({ username })
+          if (!user) {
+            return done(null, false, { message: 'Invalid username or password' })
+          }
+
+          if (!user.isActive) {
+            return done(null, false, { message: 'Account is deactivated' })
+          }
+
+          const isValidPassword = await user.comparePassword(password)
+          if (!isValidPassword) {
+            return done(null, false, { message: 'Invalid username or password' })
+          }
+
+          return done(null, user)
+        } catch (error) {
+          return done(error)
+        }
+      }
+    )
+  )
+
+  passport.serializeUser((user: any, done) => {
+    done(null, user._id.toString())
+  })
+
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      const user = await User.findById(id)
+      done(null, user)
+    } catch (error) {
+      done(error)
+    }
+  })
+
+  // Authentication middleware
+  fastify.decorate('authenticate', async (request: any, reply: any) => {
+    const sessionUser = request.session?.user
+    if (!sessionUser || !sessionUser.id) {
+      return reply.status(401).send({
+        success: false,
+        message: 'Unauthorized: No active session',
       })
     }
 
-    return reply.status(500).send({
-      error: 'Internal Server Error',
-      message: 'Something went wrong',
-    })
+    // Fetch user from database
+    const user = await User.findById(sessionUser.id).select('-password')
+    if (!user || !user.isActive) {
+      return reply.status(401).send({
+        success: false,
+        message: 'Unauthorized: User not found or inactive',
+      })
+    }
+
+    // Attach user to request
+    request.user = user
   })
+
+  // Register all routes with API prefix
+  await fastify.register(registerRoutes, { prefix: '/api' })
+
+  // Connect to database only if not in test environment
+  if (process.env['NODE_ENV'] !== 'test') {
+    await connectDatabase()
+  }
 
   return fastify
 }

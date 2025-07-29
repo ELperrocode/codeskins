@@ -4,7 +4,7 @@ export interface User {
   _id: ObjectId
   email: string
   password: string
-  role: 'admin' | 'seller' | 'customer'
+  role: 'admin' | 'customer'
   firstName?: string
   lastName?: string
   isActive: boolean

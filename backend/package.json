@@ -7,12 +7,13 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "jest --runInBand --detectOpenHandles",
+    "test:watch": "jest --watch --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
     "test:e2e": "jest --config jest.e2e.config.js",
-    "lint": "eslint src/**/*.ts",
-    "type-check": "tsc --noEmit"
+    "lint": "eslint src/**/*.ts tests/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "migrate": "tsx scripts/migrate-templates.ts"
   },
   "dependencies": {
     "@fastify/cookie": "~9.3.1",
@@ -45,6 +46,7 @@
     "@typescript-eslint/parser": "^8.36.0",
     "eslint": "^9.31.0",
     "jest": "^30.0.4",
+    "mongodb-memory-server": "^10.1.4",
     "supertest": "^7.0.0",
     "ts-jest": "^29.4.0",
     "tsx": "^4.20.3",

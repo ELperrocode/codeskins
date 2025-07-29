@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import passport from 'passport'
+import * as passport from 'passport'
 import { User, IUser } from '../models/User'
 
 interface LoginBody {
@@ -9,7 +9,7 @@ interface LoginBody {
 
 interface RegisterBody extends LoginBody {
   email: string
-  role?: 'customer' | 'seller'
+  role?: 'customer';
 }
 
 // Extend the session interface to include user data
@@ -35,7 +35,7 @@ export const registerAuthRoutes = (fastify: FastifyInstance): void => {
             username: { type: 'string', minLength: 3 },
             email: { type: 'string', format: 'email' },
             password: { type: 'string', minLength: 6 },
-            role: { type: 'string', enum: ['customer', 'seller'], default: 'customer' },
+            role: { type: 'string', enum: ['customer'], default: 'customer' },
           },
         },
       },
@@ -58,6 +58,8 @@ export const registerAuthRoutes = (fastify: FastifyInstance): void => {
           password, // plain password, hashing is handled by the model
           role,
           isActive: true,
+          firstName: username, // Use username as firstName if not provided
+          lastName: '', // Empty string as default
         })
         await user.save()
 
