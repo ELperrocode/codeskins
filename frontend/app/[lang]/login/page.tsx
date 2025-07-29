@@ -8,12 +8,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
-import { BackgroundGradient } from '../../../components/ui/aceternity/background-gradient';
-import { BackgroundBeams } from '../../../components/ui/aceternity/background-beams';
-import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react';
+import { 
+  AuthContainer, 
+  AuthCard, 
+  AuthInput, 
+  AuthButton, 
+  AuthLink, 
+  AuthIcon, 
+  AuthError, 
+  AuthSpinner, 
+  AuthTitle, 
+  AuthDescription, 
+  AuthToggleButton,
+  AuthBackground,
+  FloatingParticles,
+  BackgroundWaves,
+  ConnectionLines
+} from '../../../components/ui';
+import { IconUser, IconLock, IconArrowRight, IconEye, IconEyeOff } from '@tabler/icons-react';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { t } = useDictionary();
   const router = useRouter();
   const params = useParams();
@@ -24,18 +39,46 @@ export default function LoginPage() {
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.username.trim()) {
+      newErrors.username = t.auth.errors.usernameRequired;
+    }
+
+    if (!formData.password) {
+      newErrors.password = t.auth.errors.passwordRequired;
+    } else if (formData.password.length < 6) {
+      newErrors.password = t.auth.errors.passwordMinLength;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
+    setErrors({});
 
     try {
-      const success = await login(formData.username, formData.password);
-      if (success) {
-        router.push(`/${lang}/dashboard`);
+      const result = await login(formData.username, formData.password);
+      if (result.success && result.user) {
+        // Redirigir según el rol del usuario
+        const userRole = result.user.role;
+        router.push(`/${lang}/dashboard/${userRole}`);
       }
     } catch (error) {
       console.error('Login error:', error);
+      // Error handling is done in the auth context with toasts
     } finally {
       setIsLoading(false);
     }
@@ -47,98 +90,156 @@ export default function LoginPage() {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <BackgroundGradient className="fixed inset-0" />
-      <BackgroundBeams className="fixed inset-0" />
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+      {/* Fondo animado */}
+      <AuthBackground className="fixed inset-0">
+        <BackgroundWaves />
+        <FloatingParticles />
+        <ConnectionLines />
+      </AuthBackground>
       
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
-        <Card className="w-full max-w-md bg-card border-border shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-foreground">
-              Welcome Back
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Sign in to your account to continue
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-foreground">
-                  Username
-                </Label>
-                <div className="relative">
-                  <IconUser className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="username"
-                    name="username"
-                    type="text"
-                    placeholder="Enter your username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    required
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">
-                  Password
-                </Label>
-                <div className="relative">
-                  <IconLock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-              
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                    Signing in...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    Sign In
-                    <IconArrowRight className="w-4 h-4" />
-                  </div>
-                )}
-              </Button>
-            </form>
+      {/* Contenido principal */}
+      <AuthContainer className="relative z-10 flex items-center justify-center min-h-screen px-4 pt-16">
+        <AuthCard className="w-full max-w-md">
+          <Card className="w-full bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl">
+            <CardHeader className="text-center">
+              <AuthTitle>
+                <CardTitle className="text-3xl font-bold text-text-inverse">
+                  {t.auth.welcomeBack}
+                </CardTitle>
+              </AuthTitle>
+              <AuthDescription>
+                <CardDescription className="text-lg text-white">
+                  {t.auth.signInDescription}
+                </CardDescription>
+              </AuthDescription>
+            </CardHeader>
             
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <Button
-                  variant="link"
-                  onClick={() => router.push(`/${lang}/register`)}
-                  className="p-0 h-auto text-primary hover:text-primary/90"
-                >
-                  Sign up here
-                </Button>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <AuthInput delay={0}>
+                  <div className="space-y-2">
+                    <Label htmlFor="username" className="font-medium">
+                      {t.auth.username}
+                    </Label>
+                    <div className="relative group">
+                      <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
+                        <IconUser />
+                      </AuthIcon>
+                      <Input
+                        id="username"
+                        name="username"
+                        type="text"
+                        placeholder={t.auth.usernamePlaceholder}
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        required
+                        className={`pl-12 pr-4 py-3 bg-white/10 border-white/20 text-text-inverse placeholder:text-text-inverse/50 focus:border-primary-400 focus:bg-white/20 transition-all duration-300 ${
+                          errors.username ? 'border-error-500 focus:border-error-500' : ''
+                        }`}
+                      />
+                    </div>
+                    {errors.username && (
+                      <AuthError>
+                        <p className="text-sm text-error-500 font-medium">{errors.username}</p>
+                      </AuthError>
+                    )}
+                  </div>
+                </AuthInput>
+                
+                <AuthInput delay={0.1}>
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="font-medium">
+                      {t.auth.password}
+                    </Label>
+                    <div className="relative group">
+                      <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
+                        <IconLock />
+                      </AuthIcon>
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder={t.auth.passwordPlaceholder}
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        className={`pl-12 pr-12 py-3 bg-white/10 border-white/20 text-text-inverse placeholder:text-text-inverse/50 focus:border-primary-400 focus:bg-white/20 transition-all duration-300 ${
+                          errors.password ? 'border-error-500 focus:border-error-500' : ''
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-3 text-text-inverse/60 hover:text-text-inverse transition-colors"
+                      >
+                        {showPassword ? (
+                          <IconEyeOff className="h-5 w-5" />
+                        ) : (
+                          <IconEye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <AuthError>
+                        <p className="text-sm text-error-500 font-medium">{errors.password}</p>
+                      </AuthError>
+                    )}
+                  </div>
+                </AuthInput>
+                
+                <AuthButton>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-gradient-primary hover:bg-gradient-primary-hover text-text-inverse font-semibold py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95"
+                  >
+                    {isLoading ? (
+                      <AuthSpinner>
+                        <div className="flex items-center gap-3">
+                          <div className="w-5 h-5 border-2 border-text-inverse border-t-transparent rounded-full animate-spin"></div>
+                          <span>{t.auth.signingIn}</span>
+                        </div>
+                      </AuthSpinner>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <span>{t.auth.signIn}</span>
+                        <IconArrowRight className="w-5 h-5" />
+                      </div>
+                    )}
+                  </Button>
+                </AuthButton>
+              </form>
+              
+              <AuthLink>
+                <div className="mt-8 text-center">
+                  <p className="text-white text-base">
+                    {t.auth.noAccount}{' '}
+                    <Button
+                      variant="link"
+                      onClick={() => router.push(`/${lang}/register`)}
+                      className="p-0 h-auto text-primary-400 hover:text-primary-300 font-semibold text-base transition-colors duration-300"
+                    >
+                      {t.auth.signUp}
+                    </Button>
+                  </p>
+                </div>
+              </AuthLink>
+            </CardContent>
+          </Card>
+        </AuthCard>
+      </AuthContainer>
     </div>
   );
 } 

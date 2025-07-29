@@ -60,6 +60,22 @@ export const build = async () => {
     }
   })
 
+  // Configure content type parser for logout endpoint
+  fastify.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+    if (req.url === '/api/auth/logout') {
+      // For logout endpoint, don't parse the body
+      done(null, undefined)
+    } else {
+      // For other endpoints, parse as JSON
+      try {
+        const json = JSON.parse(body as string)
+        done(null, json)
+      } catch (err) {
+        done(err as Error)
+      }
+    }
+  })
+
   // Configure Passport Local Strategy
   passport.use(
     new LocalStrategy(

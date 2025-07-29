@@ -8,9 +8,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
-import { BackgroundGradient } from '../../../components/ui/aceternity/background-gradient';
-import { BackgroundBeams } from '../../../components/ui/aceternity/background-beams';
-import { IconUser, IconMail, IconLock, IconArrowRight } from '@tabler/icons-react';
+import { 
+  AuthContainer, 
+  AuthCard, 
+  AuthInput, 
+  AuthButton, 
+  AuthLink, 
+  AuthIcon, 
+  AuthError, 
+  AuthSpinner, 
+  AuthTitle, 
+  AuthDescription, 
+  AuthToggleButton,
+  AuthBackground,
+  FloatingParticles,
+  BackgroundWaves,
+  ConnectionLines
+} from '../../../components/ui';
+import { IconUser, IconMail, IconLock, IconArrowRight, IconEye, IconEyeOff } from '@tabler/icons-react';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -26,24 +41,60 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.username.trim()) {
+      newErrors.username = t.auth.errors.usernameRequired;
+    } else if (formData.username.length < 3) {
+      newErrors.username = t.auth.errors.usernameMinLength;
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = t.auth.errors.emailRequired;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = t.auth.errors.emailInvalid;
+    }
+
+    if (!formData.password) {
+      newErrors.password = t.auth.errors.passwordRequired;
+    } else if (formData.password.length < 6) {
+      newErrors.password = t.auth.errors.passwordMinLength;
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = t.auth.errors.confirmPasswordRequired;
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = t.auth.errors.passwordsDoNotMatch;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
-      // This will be handled by the toast system in the auth context
+    if (!validateForm()) {
       return;
     }
     
     setIsLoading(true);
+    setErrors({});
 
     try {
       const success = await register(formData.username, formData.email, formData.password, 'customer');
       if (success) {
-        router.push(`/${lang}/dashboard`);
+        // Redirigir al dashboard del cliente (nuevos usuarios son customers)
+        router.push(`/${lang}/dashboard/customer`);
       }
     } catch (error) {
       console.error('Registration error:', error);
+      // Error handling is done in the auth context with toasts
     } finally {
       setIsLoading(false);
     }
@@ -55,137 +106,229 @@ export default function RegisterPage() {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <BackgroundGradient className="fixed inset-0" />
-      <BackgroundBeams className="fixed inset-0" />
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+      {/* Fondo animado */}
+      <AuthBackground className="fixed inset-0">
+        <BackgroundWaves />
+        <FloatingParticles />
+        <ConnectionLines />
+      </AuthBackground>
       
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
-        <Card className="w-full max-w-md bg-card border-border shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-foreground">
-              Create Account
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Join CodeSkins and start building amazing projects
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-foreground">
-                  Username
-                </Label>
-                <div className="relative">
-                  <IconUser className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="username"
-                    name="username"
-                    type="text"
-                    placeholder="Choose a username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    required
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">
-                  Email
-                </Label>
-                <div className="relative">
-                  <IconMail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">
-                  Password
-                </Label>
-                <div className="relative">
-                  <IconLock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Create a password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    minLength={6}
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground">
-                  Confirm Password
-                </Label>
-                <div className="relative">
-                  <IconLock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    required
-                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
-                  />
-                </div>
-              </div>
-              
-              <Button
-                type="submit"
-                disabled={isLoading || formData.password !== formData.confirmPassword}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                    Creating account...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    Create Account
-                    <IconArrowRight className="w-4 h-4" />
-                  </div>
-                )}
-              </Button>
-            </form>
+      {/* Contenido principal */}
+      <AuthContainer className="relative z-10 flex items-center justify-center min-h-screen px-4 pt-16">
+        <AuthCard className="w-full max-w-md">
+          <Card className="w-full bg-white/10 backdrop-blur-xl border-white/20 shadow-2xl">
+            <CardHeader className="text-center">
+              <AuthTitle>
+                <CardTitle className="text-3xl font-bold text-text-inverse">
+                  {t.auth.createAccount}
+                </CardTitle>
+              </AuthTitle>
+              <AuthDescription>
+                <CardDescription className="text-lg text-white">
+                  {t.auth.joinDescription}
+                </CardDescription>
+              </AuthDescription>
+            </CardHeader>
             
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <Button
-                  variant="link"
-                  onClick={() => router.push(`/${lang}/login`)}
-                  className="p-0 h-auto text-primary hover:text-primary/90"
-                >
-                  Sign in here
-                </Button>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <AuthInput delay={0}>
+                  <div className="space-y-2">
+                    <Label htmlFor="username" className="font-medium">
+                      {t.auth.username}
+                    </Label>
+                    <div className="relative group">
+                      <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
+                        <IconUser />
+                      </AuthIcon>
+                      <Input
+                        id="username"
+                        name="username"
+                        type="text"
+                        placeholder={t.auth.usernamePlaceholder}
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        required
+                        minLength={3}
+                        className={`pl-12 pr-4 py-3 bg-white/10 border-white/20 text-text-inverse placeholder:text-text-inverse/50 focus:border-primary-400 focus:bg-white/20 transition-all duration-300 ${
+                          errors.username ? 'border-error-500 focus:border-error-500' : ''
+                        }`}
+                      />
+                    </div>
+                    {errors.username && (
+                      <AuthError>
+                        <p className="text-sm text-error-500 font-medium">{errors.username}</p>
+                      </AuthError>
+                    )}
+                  </div>
+                </AuthInput>
+                
+                <AuthInput delay={0.1}>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="font-medium">
+                      {t.auth.email}
+                    </Label>
+                    <div className="relative group">
+                      <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
+                        <IconMail />
+                      </AuthIcon>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder={t.auth.emailPlaceholder}
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className={`pl-12 pr-4 py-3 bg-white/10 border-white/20 text-text-inverse placeholder:text-text-inverse/50 focus:border-primary-400 focus:bg-white/20 transition-all duration-300 ${
+                          errors.email ? 'border-error-500 focus:border-error-500' : ''
+                        }`}
+                      />
+                    </div>
+                    {errors.email && (
+                      <AuthError>
+                        <p className="text-sm text-error-500 font-medium">{errors.email}</p>
+                      </AuthError>
+                    )}
+                  </div>
+                </AuthInput>
+                
+                <AuthInput delay={0.2}>
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="font-medium">
+                      {t.auth.password}
+                    </Label>
+                    <div className="relative group">
+                      <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
+                        <IconLock />
+                      </AuthIcon>
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder={t.auth.passwordPlaceholder}
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        minLength={6}
+                        className={`pl-12 pr-12 py-3 bg-white/10 border-white/20 text-text-inverse placeholder:text-text-inverse/50 focus:border-primary-400 focus:bg-white/20 transition-all duration-300 ${
+                          errors.password ? 'border-error-500 focus:border-error-500' : ''
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-3 text-text-inverse/60 hover:text-text-inverse transition-colors"
+                      >
+                        {showPassword ? (
+                          <IconEyeOff className="h-5 w-5" />
+                        ) : (
+                          <IconEye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <AuthError>
+                        <p className="text-sm text-error-500 font-medium">{errors.password}</p>
+                      </AuthError>
+                    )}
+                  </div>
+                </AuthInput>
+                
+                <AuthInput delay={0.3}>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="font-medium">
+                      {t.auth.confirmPassword}
+                    </Label>
+                    <div className="relative group">
+                      <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
+                        <IconLock />
+                      </AuthIcon>
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder={t.auth.confirmPasswordPlaceholder}
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        required
+                        className={`pl-12 pr-12 py-3 bg-white/10 border-white/20 text-text-inverse placeholder:text-text-inverse/50 focus:border-primary-400 focus:bg-white/20 transition-all duration-300 ${
+                          errors.confirmPassword ? 'border-error-500 focus:border-error-500' : ''
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-3 text-text-inverse/60 hover:text-text-inverse transition-colors"
+                      >
+                        {showConfirmPassword ? (
+                          <IconEyeOff className="h-5 w-5" />
+                        ) : (
+                          <IconEye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    {errors.confirmPassword && (
+                      <AuthError>
+                        <p className="text-sm text-error-500 font-medium">{errors.confirmPassword}</p>
+                      </AuthError>
+                    )}
+                  </div>
+                </AuthInput>
+                
+                <AuthButton>
+                  <Button
+                    type="submit"
+                    disabled={isLoading || formData.password !== formData.confirmPassword}
+                    className="w-full bg-gradient-primary hover:bg-gradient-primary-hover text-text-inverse font-semibold py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95"
+                  >
+                    {isLoading ? (
+                      <AuthSpinner>
+                        <div className="flex items-center gap-3">
+                          <div className="w-5 h-5 border-2 border-text-inverse border-t-transparent rounded-full animate-spin"></div>
+                          <span>{t.auth.creatingAccount}</span>
+                        </div>
+                      </AuthSpinner>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <span>{t.auth.createAccount}</span>
+                        <IconArrowRight className="w-5 h-5" />
+                      </div>
+                    )}
+                  </Button>
+                </AuthButton>
+              </form>
+              
+              <AuthLink>
+                <div className="mt-8 text-center">
+                  <p className="text-white text-base">
+                    {t.auth.hasAccount}{' '}
+                    <Button
+                      variant="link"
+                      onClick={() => router.push(`/${lang}/login`)}
+                      className="p-0 h-auto text-primary-400 hover:text-primary-300 font-semibold text-base transition-colors duration-300"
+                    >
+                      {t.auth.signIn}
+                    </Button>
+                  </p>
+                </div>
+              </AuthLink>
+            </CardContent>
+          </Card>
+        </AuthCard>
+      </AuthContainer>
     </div>
   );
 } 

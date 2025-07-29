@@ -1,7 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { Review } from '../models/Review'
 import { Template } from '../models/Template'
-import { Download } from '../models/Download'
 
 interface CreateReviewBody {
   templateId: string
@@ -169,13 +168,16 @@ export const registerReviewRoutes = (fastify: FastifyInstance): void => {
           return reply.status(409).send({ success: false, message: 'You have already reviewed this template' })
         }
 
-        // Check if user has downloaded/purchased the template (for verification)
-        const downloadRecord = await Download.findOne({
-          userId: sessionUser.id,
-          templateId,
+        // Check if user has purchased the template (for verification)
+        // Since we removed the Download model, we'll check if user has a completed order
+        const { Order } = require('../models/Order');
+        const orderRecord = await Order.findOne({
+          customerId: sessionUser.id,
+          'items.templateId': templateId,
+          status: 'completed',
         })
 
-        const isVerified = !!downloadRecord
+        const isVerified = !!orderRecord
 
         const review = new Review({
           userId: sessionUser.id,

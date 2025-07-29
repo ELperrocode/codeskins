@@ -6,6 +6,7 @@ import { User, IUser } from '../models/User';
 import { Cart } from '../models/Cart';
 import { Order } from '../models/Order';
 import { Template } from '../models/Template';
+import { License } from '../models/License';
 
 // Initialize Stripe with secret key
 const stripeKey = process.env['STRIPE_SECRET_KEY'];
@@ -67,10 +68,27 @@ export const registerStripeRoutes = (fastify: FastifyInstance): void => {
 
       // Validate templates exist and get their details
       const templateIds = items.map(item => item.templateId);
-      const templates = await Template.find({ _id: { $in: templateIds }, isActive: true });
+      const templates = await Template.find({ _id: { $in: templateIds }, isActive: true })
+        .populate('licenseId', 'name price maxSales');
       
       if (templates.length !== items.length) {
         return reply.status(400).send({ success: false, message: 'Some templates not found or inactive' });
+      }
+
+      // Check sales limits for each template
+      for (const template of templates) {
+        const license = template.licenseId as any;
+        if (license && license.maxSales !== -1) {
+          const currentSales = template.sales || 0;
+          const maxSales = license.maxSales;
+          
+          if (currentSales >= maxSales) {
+            return reply.status(400).send({ 
+              success: false, 
+              message: `Template "${template.title}" has reached its sales limit (${maxSales} sales)` 
+            });
+          }
+        }
       }
 
       // Create line items for Stripe
@@ -294,6 +312,15 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         try {
           await order.save();
           console.log('Order created successfully with templates:', order._id);
+          
+          // Increment sales count for each template
+          for (const template of templates) {
+            await Template.findByIdAndUpdate(template._id, {
+              $inc: { sales: 1 }
+            });
+            console.log(`Sales count incremented for template: ${template.title}`);
+          }
+          
           console.log('=== END: handleCheckoutSessionCompleted ===');
           return;
         } catch (error: any) {

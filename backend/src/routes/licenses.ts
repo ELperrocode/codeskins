@@ -4,13 +4,15 @@ import { License } from '../models/License'
 interface CreateLicenseBody {
   name: string
   description: string
-  maxDownloads: number
+  price: number
+  maxSales?: number
 }
 
 interface UpdateLicenseBody {
   name?: string
   description?: string
-  maxDownloads?: number
+  price?: number
+  maxSales?: number
   isActive?: boolean
 }
 
@@ -77,11 +79,11 @@ export const registerLicenseRoutes = (fastify: FastifyInstance): void => {
       schema: {
         body: {
           type: 'object',
-          required: ['name', 'description', 'maxDownloads'],
+          required: ['name', 'description', 'price'],
           properties: {
             name: { type: 'string', minLength: 2, maxLength: 50 },
             description: { type: 'string', minLength: 10, maxLength: 200 },
-            maxDownloads: { type: 'number', minimum: -1 },
+            price: { type: 'number', minimum: 0 },
           },
         },
       },
@@ -98,7 +100,7 @@ export const registerLicenseRoutes = (fastify: FastifyInstance): void => {
           return reply.status(403).send({ success: false, message: 'Only admins can create license types' })
         }
 
-        const { name, description, maxDownloads } = request.body
+        const { name, description, price, maxSales } = request.body
 
         // Check if license name already exists
         const existingLicense = await License.findOne({ name })
@@ -109,7 +111,8 @@ export const registerLicenseRoutes = (fastify: FastifyInstance): void => {
         const license = new License({
           name,
           description,
-          maxDownloads,
+          price,
+          maxSales: maxSales || -1, // Default to unlimited if not specified
         })
 
         await license.save()
@@ -144,7 +147,7 @@ export const registerLicenseRoutes = (fastify: FastifyInstance): void => {
           properties: {
             name: { type: 'string', minLength: 2, maxLength: 50 },
             description: { type: 'string', minLength: 10, maxLength: 200 },
-            maxDownloads: { type: 'number', minimum: -1 },
+            price: { type: 'number', minimum: 0 },
             isActive: { type: 'boolean' },
           },
         },

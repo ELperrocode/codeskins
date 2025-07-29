@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
     const response = await fetch(`${BACKEND_URL}/api/auth/logout`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Cookie': request.headers.get('cookie') || '',
       },
       credentials: 'include',

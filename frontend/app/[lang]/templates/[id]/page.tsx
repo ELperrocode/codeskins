@@ -36,7 +36,7 @@ type Template = {
   licenseId?: {
     _id: string;
     name: string;
-    maxDownloads: number;
+    price: number;
   };
   ownerId: {
     _id: string;

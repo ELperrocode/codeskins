@@ -9,7 +9,7 @@ import { registerStripeRoutes } from './stripe';
 import { registerUserRoutes } from './users';
 import { registerCategoryRoutes } from './categories';
 import { registerTagRoutes } from './tags';
-import { registerDownloadRoutes } from './downloads';
+
 import { registerReviewRoutes } from './reviews';
 import { registerFavoriteRoutes } from './favorites';
 import { registerTestRoutes } from './test';
@@ -26,7 +26,7 @@ export const registerRoutes = async (fastify: FastifyInstance): Promise<void> =>
   await fastify.register(registerUserRoutes, { prefix: '/users' });
   await fastify.register(registerCategoryRoutes, { prefix: '/categories' });
   await fastify.register(registerTagRoutes, { prefix: '/tags' });
-  await fastify.register(registerDownloadRoutes, { prefix: '/downloads' });
+
   await fastify.register(registerReviewRoutes, { prefix: '/reviews' });
   await fastify.register(registerFavoriteRoutes, { prefix: '/favorites' });
   await fastify.register(registerTestRoutes, { prefix: '/test' });

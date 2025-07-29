@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IFavorite extends Document {
   userId: string;
-  templateId: string;
+  templateId: string | any; // Can be string (ID) or populated object
   createdAt: Date;
   updatedAt: Date;
 }

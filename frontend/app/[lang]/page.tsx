@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { HeroParallax } from '../../components/ui/hero-parallax';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
-import { IconRocket, IconCode, IconPalette, IconUsers, IconStar, IconDownload } from '@tabler/icons-react';
+import { IconRocket, IconCode, IconPalette, IconUsers, IconStar, IconDownload, IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconMail, IconHeart } from '@tabler/icons-react';
+import { useTranslation } from '../../lib/hooks/useTranslation';
 
 // FAQ Accordion Component
 const FAQAccordion = ({ question, answer, index }: { question: string; answer: string; index: number }) => {
@@ -55,7 +57,8 @@ interface License {
   _id: string;
   name: string;
   description: string;
-  maxDownloads: number;
+  price: number;
+  maxSales?: number;
   isActive: boolean;
 }
 
@@ -63,9 +66,12 @@ export default function HomePage() {
   const router = useRouter();
   const params = useParams();
   const lang = params.lang as string;
+  const { t } = useTranslation();
   
   const [licenses, setLicenses] = useState<License[]>([]);
   const [licensesLoading, setLicensesLoading] = useState(true);
+  const [categories, setCategories] = useState<Array<{ _id: string; name: string; description?: string; imageUrl?: string; templateCount: number; isActive: boolean }>>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   
   // Sample products for Hero Parallax with real images from Unsplash
   const products = [
@@ -197,49 +203,34 @@ export default function HomePage() {
     fetchLicenses();
   }, []);
 
+  // Fetch categories with images from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories?active=true');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data?.categories) {
+            setCategories(data.data.categories);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleCategoryClick = (category: { _id: string; name: string; description?: string; imageUrl?: string; templateCount: number; isActive?: boolean }) => {
+    router.push(`/${lang}/templates?category=${category.name}`);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       
-      {/* Hero Section */}
-      <section className="relative z-10 pt-20 pb-20">
-        <div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <h1 className="text-4xl md:text-7xl font-bold text-white mb-6">
-              Build Amazing <br />
-              <span className="bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent">
-                Websites
-              </span>
-            </h1>
-            <p className="max-w-2xl mx-auto text-lg md:text-xl text-white/80 mb-10">
-              Premium website templates for developers, designers, and businesses. 
-              Start building your next project with our professional templates.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-gradient-primary hover:bg-gradient-primary-hover text-white font-semibold px-8 py-4 text-lg"
-                onClick={() => router.push(`/${lang}/templates`)}
-              >
-                Browse Templates
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-white/20 text-white hover:bg-white/10 font-semibold px-8 py-4 text-lg"
-                onClick={() => router.push(`/${lang}/templates`)}
-              >
-                Learn More
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Hero Parallax Section */}
       <div className="relative z-10">
         <HeroParallax products={products} />
@@ -539,9 +530,7 @@ export default function HomePage() {
               licenses.map((license, index) => {
                 // Generate features based on license data
                 const features = [
-                  license.maxDownloads === -1 ? "Unlimited downloads" : 
-                  license.maxDownloads === 1 ? "1 download" : 
-                  `${license.maxDownloads} downloads`,
+                  "Unlimited downloads",
                   
                   license.name.includes('Extended') || license.name.includes('Developer') || license.name.includes('Premium') ? "Commercial use" : "Personal use",
                   
@@ -555,7 +544,9 @@ export default function HomePage() {
                   license.name.includes('Extended') || license.name.includes('Premium') ? "Priority support" : "Basic support",
                   
                   license.name.includes('Developer') ? "Dedicated support" : 
-                  license.name.includes('Extended') || license.name.includes('Premium') ? "Lifetime updates" : "1 year updates"
+                  license.name.includes('Extended') || license.name.includes('Premium') ? "Lifetime updates" : "1 year updates",
+                  
+                  license.maxSales && license.maxSales !== -1 ? `Limited to ${license.maxSales} sales` : "Unlimited sales"
                 ].filter(Boolean);
 
                 const isPopular = license.name.includes('Extended');
@@ -587,7 +578,7 @@ export default function HomePage() {
                         </p>
                         <div className="mt-4">
                           <span className={`text-2xl font-semibold ${isPopular ? 'text-white' : 'text-white'}`}>
-                            {license.maxDownloads === -1 ? 'Unlimited' : `${license.maxDownloads} Downloads`}
+                            Unlimited Downloads
                           </span>
                         </div>
                       </CardHeader>
@@ -696,6 +687,141 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Footer Section - Integrated with landing page background */}
+      <footer className="relative z-10 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+            {/* Brand Section */}
+            <div className="lg:col-span-2">
+              <Link href={`/${lang}`} className="flex items-center space-x-2 mb-4 group">
+                <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-bold text-lg">C</span>
+                </div>
+                <span className="font-bold text-xl group-hover:text-primary-400 transition-colors duration-300 text-white drop-shadow-lg">CodeSkins</span>
+              </Link>
+              <p className="mb-6 max-w-md leading-relaxed text-white/70">
+                Premium website templates and components for modern web development. 
+                Built with the latest technologies and designed for developers who care about quality.
+              </p>
+              
+              {/* Social Links */}
+              <div className="flex space-x-4">
+                {[
+                  { name: 'GitHub', href: 'https://github.com', icon: IconBrandGithub },
+                  { name: 'Twitter', href: 'https://twitter.com', icon: IconBrandTwitter },
+                  { name: 'LinkedIn', href: 'https://linkedin.com', icon: IconBrandLinkedin },
+                  { name: 'Email', href: 'mailto:contact@codeskins.com', icon: IconMail },
+                ].map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/60 hover:text-primary-400 hover:scale-110 transition-all duration-300 p-2 rounded-lg hover:bg-white/10"
+                    aria-label={social.name}
+                  >
+                    <social.icon className="w-5 h-5" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Product Links */}
+            <div>
+              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">Product</h3>
+              <ul className="space-y-2">
+                {[
+                  { name: 'Templates', href: `/${lang}/templates` },
+                  { name: 'Categories', href: `/${lang}/templates?category=all` },
+                  { name: 'New Arrivals', href: `/${lang}/templates?sort=newest` },
+                  { name: 'Popular', href: `/${lang}/templates?sort=popular` },
+                ].map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className="text-white/70 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company Links */}
+            <div>
+              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">Company</h3>
+              <ul className="space-y-2">
+                {[
+                  { name: 'Login', href: `/${lang}/login` },
+                  { name: 'Register', href: `/${lang}/register` },
+                ].map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className="text-white/70 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support Links */}
+            <div>
+              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">Support</h3>
+              <ul className="space-y-2">
+                {[
+                  { name: 'Cart', href: `/${lang}/cart` },
+                  { name: 'Checkout', href: `/${lang}/checkout` },
+                ].map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className="text-white/70 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Section */}
+          <div className="border-t border-white/10 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              {/* Copyright */}
+              <div className="flex items-center space-x-2 text-white/70">
+                <span>&copy; {new Date().getFullYear()} CodeSkins. All rights reserved.</span>
+                <span className="hidden sm:inline text-white/40">•</span>
+                <span className="hidden sm:inline">Made with</span>
+                <IconHeart className="w-4 h-4 text-red-400 animate-pulse" />
+                <span className="hidden sm:inline">for developers</span>
+              </div>
+
+              {/* Legal Links */}
+              <div className="flex flex-wrap justify-center md:justify-end space-x-6">
+                {[
+                  { name: 'Terms of Service', href: '#' },
+                  { name: 'Privacy Policy', href: '#' },
+                ].map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className="text-white/60 hover:text-white transition-colors duration-300 text-sm hover:underline"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );

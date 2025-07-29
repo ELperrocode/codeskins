@@ -137,7 +137,11 @@ export const registerAuthRoutes = (fastify: FastifyInstance): void => {
   )
 
   // Logout user
-  fastify.post('/logout', (request, reply) => {
+  fastify.post('/logout', {
+    schema: {
+      body: false, // No body required for logout
+    },
+  }, (request, reply) => {
     // Clear session data
     delete request.session.user
     // Clear the session cookie
