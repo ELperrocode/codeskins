@@ -12,10 +12,10 @@ interface CreateTemplateBody {
   description: string;
   licenseId: string;
   price: number;
-  maxDownloads: number;
   category: string;
   tags?: string[];
   fileUrl?: string;
+  previewUrl?: string;
   previewImages?: string[];
   features?: string[];
   status?: 'active' | 'inactive' | 'draft';
@@ -64,10 +64,18 @@ export const registerTemplateRoutes = (fastify: FastifyInstance): void => {
       } = request.query;
 
       // Build filter object
-      const filter: any = { isActive: true };
+      const filter: any = {};
       
-      if (status && status !== 'all') {
-        filter.status = status;
+      // Para el admin, si status=all, no aplicamos filtros de estado
+      if (status === 'all') {
+        // No aplicar filtros de estado para ver todos los templates
+      } else {
+        // Para usuarios normales, solo mostrar templates activos y disponibles
+        filter.isActive = true;
+        filter.status = 'active';
+        
+        // Solo mostrar templates que no han alcanzado su límite de ventas
+        // Esto se aplicará después de poblar los datos de licencia
       }
       
       if (category) {
@@ -117,15 +125,42 @@ export const registerTemplateRoutes = (fastify: FastifyInstance): void => {
 
       const skip = (page - 1) * limit;
 
-      const [templates, total] = await Promise.all([
-        Template.find(filter)
-          .populate('ownerId', 'username firstName lastName')
-          .populate('licenseId', 'name description')
-          .sort(sortObj)
-          .skip(skip)
-          .limit(limit),
-        Template.countDocuments(filter)
-      ]);
+      // Primero obtenemos todos los templates con la información de licencia
+      let templates = await Template.find(filter)
+        .populate('ownerId', 'username firstName lastName')
+        .populate('licenseId', 'name description price maxSales')
+        .sort(sortObj)
+        .skip(skip)
+        .limit(limit * 2); // Obtenemos más para compensar el filtrado
+
+      // Filtramos por disponibilidad para usuarios normales
+      if (status !== 'all') {
+        templates = templates.filter(template => {
+          const license = template.licenseId as any;
+          if (license && license.maxSales && license.maxSales > 0) {
+            return template.sales < license.maxSales;
+          }
+          return true; // Sin límite de ventas
+        });
+      }
+
+      // Limitamos al número solicitado después del filtrado
+      templates = templates.slice(0, limit);
+
+      // Contamos el total real después del filtrado
+      const allTemplates = await Template.find(filter)
+        .populate('licenseId', 'maxSales');
+      
+      let total = allTemplates.length;
+      if (status !== 'all') {
+        total = allTemplates.filter(template => {
+          const license = template.licenseId as any;
+          if (license && license.maxSales && license.maxSales > 0) {
+            return template.sales < license.maxSales;
+          }
+          return true;
+        }).length;
+      }
 
       const totalPages = Math.ceil(total / limit);
 
@@ -154,15 +189,13 @@ export const registerTemplateRoutes = (fastify: FastifyInstance): void => {
       const { id } = request.params as { id: string };
       const template = await Template.findById(id)
         .populate('ownerId', 'username firstName lastName')
-        .populate('licenseId', 'name description price maxDownloads');
+        .populate('licenseId', 'name description price maxSales');
 
       if (!template) {
         return reply.status(404).send({ success: false, message: 'Template not found' });
       }
 
-      // Increment downloads count
-      template.downloads += 1;
-      await template.save();
+
 
       return { success: true, data: { template } };
     } catch (error) {

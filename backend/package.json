@@ -13,7 +13,8 @@
     "test:e2e": "jest --config jest.e2e.config.js",
     "lint": "eslint src/**/*.ts tests/**/*.ts",
     "type-check": "tsc --noEmit",
-    "migrate": "tsx scripts/migrate-templates.ts"
+    "migrate": "tsx scripts/migrate-templates.ts",
+    "check-availability": "tsx scripts/update-template-availability.ts"
   },
   "dependencies": {
     "@fastify/cookie": "~9.3.1",

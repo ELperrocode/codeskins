@@ -50,19 +50,24 @@ export const registerCartRoutes = (fastify: FastifyInstance): void => {
         return reply.status(401).send({ success: false, message: 'User not authenticated' });
       }
 
+      // Solo permitir cantidad 1 por template
+      if (quantity !== 1) {
+        return reply.status(400).send({ success: false, message: 'Only 1 template per cart item is allowed' });
+      }
+
       // Verify template exists and is active
       const template = await Template.findOne({ _id: templateId, isActive: true }).populate('licenseId');
       if (!template) {
         return reply.status(404).send({ success: false, message: 'Template not found or inactive' });
       }
 
-      // Validate license and download limits
-      if (template.licenseId) {
-        const license = template.licenseId as any;
-        if (license.maxDownloads !== -1 && quantity > license.maxDownloads) {
+      // Verificar que el template esté disponible (no haya alcanzado su límite de ventas)
+      const license = template.licenseId as any;
+      if (license && license.maxSales && license.maxSales > 0) {
+        if (template.sales >= license.maxSales) {
           return reply.status(400).send({ 
             success: false, 
-            message: `Cannot add ${quantity} items. This template has a limit of ${license.maxDownloads} downloads per license.` 
+            message: 'This template has reached its sales limit and is no longer available' 
           });
         }
       }
@@ -77,35 +82,25 @@ export const registerCartRoutes = (fastify: FastifyInstance): void => {
         item.templateId.toString() === templateId
       );
 
-      if (existingItemIndex > -1 && cart.items[existingItemIndex]) {
-        // Update quantity
-        const newQuantity = cart.items[existingItemIndex].quantity + quantity;
-        
-        // Validate total quantity against license limits
-        if (template.licenseId) {
-          const license = template.licenseId as any;
-          if (license.maxDownloads !== -1 && newQuantity > license.maxDownloads) {
-            return reply.status(400).send({ 
-              success: false, 
-              message: `Cannot add ${quantity} more items. Total quantity (${newQuantity}) would exceed the limit of ${license.maxDownloads} downloads.` 
-            });
-          }
-        }
-        
-        cart.items[existingItemIndex].quantity = newQuantity;
-      } else {
-        // Add new item with additional information
-        cart.items.push({
-          templateId: template._id as any,
-          title: template.title,
-          description: template.description,
-          price: template.price,
-          quantity,
-          previewImages: template.previewImages || [],
-          category: template.category,
-          tags: template.tags || []
+      if (existingItemIndex > -1) {
+        // Template already in cart, no need to add again
+        return reply.status(400).send({ 
+          success: false, 
+          message: 'This template is already in your cart' 
         });
       }
+
+      // Add new item with additional information
+      cart.items.push({
+        templateId: template._id as any,
+        title: template.title,
+        description: template.description,
+        price: template.price,
+        quantity: 1, // Siempre 1
+        previewImages: template.previewImages || [],
+        category: template.category,
+        tags: template.tags || []
+      });
 
       await cart.save();
 
@@ -115,58 +110,12 @@ export const registerCartRoutes = (fastify: FastifyInstance): void => {
     }
   });
 
-  // Update cart item quantity
+  // Update cart item quantity - DISABLED: Only 1 template per cart item allowed
   fastify.put('/update', { preHandler: authenticate }, async (request: CartRequest, reply: FastifyReply) => {
-    try {
-      const { templateId, quantity } = request.body as UpdateCartItemBody;
-      const userId = request.user?._id;
-      if (!userId) {
-        return reply.status(401).send({ success: false, message: 'User not authenticated' });
-      }
-
-      if (quantity <= 0) {
-        return reply.status(400).send({ success: false, message: 'Quantity must be greater than 0' });
-      }
-
-      // Get template with license info for validation
-      const template = await Template.findOne({ _id: templateId, isActive: true }).populate('licenseId');
-      if (!template) {
-        return reply.status(404).send({ success: false, message: 'Template not found or inactive' });
-      }
-
-      // Validate license and download limits
-      if (template.licenseId) {
-        const license = template.licenseId as any;
-        if (license.maxDownloads !== -1 && quantity > license.maxDownloads) {
-          return reply.status(400).send({ 
-            success: false, 
-            message: `Cannot set quantity to ${quantity}. This template has a limit of ${license.maxDownloads} downloads per license.` 
-          });
-        }
-      }
-
-      const cart = await Cart.findOne({ userId });
-      if (!cart) {
-        return reply.status(404).send({ success: false, message: 'Cart not found' });
-      }
-
-      const itemIndex = cart.items.findIndex(item => 
-        item.templateId.toString() === templateId
-      );
-
-      if (itemIndex === -1) {
-        return reply.status(404).send({ success: false, message: 'Item not found in cart' });
-      }
-
-      if (cart.items[itemIndex]) {
-        cart.items[itemIndex].quantity = quantity;
-      }
-      await cart.save();
-
-      return { success: true, data: { cart } };
-    } catch (error) {
-      reply.status(500).send({ success: false, message: 'Error updating cart', error: (error as Error).message });
-    }
+    return reply.status(400).send({ 
+      success: false, 
+      message: 'Quantity updates are not allowed. Only 1 template per cart item.' 
+    });
   });
 
   // Remove item from cart

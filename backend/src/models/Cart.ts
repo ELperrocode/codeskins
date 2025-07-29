@@ -25,7 +25,7 @@ const cartItemSchema = new Schema<ICartItem>({
   title: { type: String, required: true },
   description: { type: String },
   price: { type: Number, required: true, min: 0 },
-  quantity: { type: Number, required: true, default: 1, min: 1 },
+  quantity: { type: Number, required: true, default: 1, min: 1, max: 1 }, // Solo permite 1 por template
   previewImages: [{ type: String }],
   category: { type: String },
   tags: [{ type: String }]
