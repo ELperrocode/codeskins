@@ -306,7 +306,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           status: 'completed',
           paymentMethod: 'stripe',
           customerEmail: session.customer_details?.email || 'test@example.com',
-          ownerId: userId,
+          ownerId: templates[0]?.ownerId || userId,
         });
 
         try {
@@ -315,10 +315,12 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           
           // Increment sales count for each template
           for (const template of templates) {
-            await Template.findByIdAndUpdate(template._id, {
-              $inc: { sales: 1 }
-            });
-            console.log(`Sales count incremented for template: ${template.title}`);
+            const updateResult = await Template.findByIdAndUpdate(
+              template._id, 
+              { $inc: { sales: 1 } },
+              { new: true }
+            );
+            console.log(`Sales count incremented for template: ${template.title}, new sales count: ${updateResult?.sales}`);
           }
           
           console.log('=== END: handleCheckoutSessionCompleted ===');
@@ -379,7 +381,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       status: 'completed',
       paymentMethod: 'stripe',
       customerEmail: session.customer_details?.email || '',
-      ownerId: userId,
+      ownerId: cart.items[0]?.templateId ? await getTemplateOwner(cart.items[0].templateId) : userId,
     });
 
     try {
@@ -390,6 +392,16 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         { userId },
         { $set: { items: [], total: 0 } }
       );
+
+      // Increment sales count for each template in cart
+      for (const item of cart.items) {
+        const updateResult = await Template.findByIdAndUpdate(
+          item.templateId, 
+          { $inc: { sales: item.quantity } },
+          { new: true }
+        );
+        console.log(`Sales count incremented for template: ${item.title}, new sales count: ${updateResult?.sales}`);
+      }
 
       console.log('Order created successfully:', order._id);
       console.log('=== END: handleCheckoutSessionCompleted ===');
@@ -405,6 +417,17 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     console.error('Error handling checkout session completed:', error);
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     console.log('=== END: handleCheckoutSessionCompleted (ERROR) ===');
+  }
+}
+
+// Helper function to get template owner
+async function getTemplateOwner(templateId: string): Promise<string> {
+  try {
+    const template = await Template.findById(templateId);
+    return template?.ownerId?.toString() || '';
+  } catch (error) {
+    console.error('Error getting template owner:', error);
+    return '';
   }
 }
 

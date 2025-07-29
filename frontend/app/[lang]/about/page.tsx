@@ -3,36 +3,39 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { IconRocket, IconCode, IconPalette, IconUsers, IconStar, IconDownload, IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconMail } from '@tabler/icons-react';
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   const features = [
     {
       icon: <IconCode className="w-8 h-8" />,
-      title: "Modern Development",
-      description: "Built with the latest technologies including React, Next.js, and TypeScript for optimal performance and developer experience."
+      title: t('about.features.modernDevelopment.title'),
+      description: t('about.features.modernDevelopment.description')
     },
     {
       icon: <IconPalette className="w-8 h-8" />,
-      title: "Beautiful Design",
-      description: "Carefully crafted templates with modern UI/UX principles, ensuring your projects look professional and engaging."
+      title: t('about.features.beautifulDesign.title'),
+      description: t('about.features.beautifulDesign.description')
     },
     {
       icon: <IconRocket className="w-8 h-8" />,
-      title: "Fast & Responsive",
-      description: "Optimized for speed and mobile-first design, ensuring your websites work perfectly on all devices."
+      title: t('about.features.fastResponsive.title'),
+      description: t('about.features.fastResponsive.description')
     },
     {
       icon: <IconUsers className="w-8 h-8" />,
-      title: "Community Driven",
-      description: "Built by developers, for developers. Our templates are designed with real-world use cases in mind."
+      title: t('about.features.communityDriven.title'),
+      description: t('about.features.communityDriven.description')
     }
   ];
 
   const stats = [
-    { number: "100+", label: "Templates" },
-    { number: "50K+", label: "Downloads" },
-    { number: "4.9", label: "Rating" },
-    { number: "24/7", label: "Support" }
+    { number: "100+", label: t('about.stats.templates') },
+    { number: "50K+", label: t('about.stats.downloads') },
+    { number: "4.9", label: t('about.stats.rating') },
+    { number: "24/7", label: t('about.stats.support') }
   ];
 
   return (
@@ -47,14 +50,13 @@ export default function AboutPage() {
             className="text-center"
           >
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              About <br />
+              {t('about.hero.title')} <br />
               <span className="bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent">
-                CodeSkins
+                {t('about.hero.subtitle')}
               </span>
             </h1>
             <p className="max-w-3xl mx-auto text-lg md:text-xl text-white/80 mb-10">
-              We're passionate about helping developers and businesses create stunning websites quickly and efficiently. 
-              Our premium templates are designed to accelerate your development process while maintaining the highest quality standards.
+              {t('about.hero.description')}
             </p>
           </motion.div>
         </div>
@@ -100,10 +102,10 @@ export default function AboutPage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Why Choose CodeSkins?
+              {t('about.features.title')}
             </h2>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              We provide everything you need to create stunning websites quickly and efficiently.
+              {t('about.features.subtitle')}
             </p>
           </motion.div>
           
@@ -146,18 +148,13 @@ export default function AboutPage() {
             className="text-center"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
-              Our Mission
+              {t('about.mission.title')}
             </h2>
             <p className="text-lg text-white/80 leading-relaxed mb-8">
-              At CodeSkins, we believe that every developer deserves access to high-quality, 
-              professional templates that can accelerate their development process. Our mission 
-              is to provide the best website templates that combine modern design with clean, 
-              maintainable code.
+              {t('about.mission.description1')}
             </p>
             <p className="text-lg text-white/80 leading-relaxed">
-              Whether you're building a portfolio, launching a startup, or creating a corporate website, 
-              our templates are designed to help you succeed. We're committed to continuous improvement 
-              and staying up-to-date with the latest web development trends and technologies.
+              {t('about.mission.description2')}
             </p>
           </motion.div>
         </div>
@@ -174,10 +171,10 @@ export default function AboutPage() {
             className="text-center"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
-              Get in Touch
+              {t('about.contact.title')}
             </h2>
             <p className="text-lg text-white/80 mb-8">
-              Have questions or suggestions? We'd love to hear from you!
+              {t('about.contact.description')}
             </p>
             <div className="flex justify-center space-x-6">
               <a href="mailto:contact@codeskins.com" className="text-white/80 hover:text-primary-300 transition-colors">

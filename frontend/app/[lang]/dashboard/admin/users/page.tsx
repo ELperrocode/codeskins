@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAuth } from "../../../../../lib/auth-context";
-import { useDictionary } from "../../../../../lib/hooks/useDictionary";
-import { getUsers, updateUser, deleteUser } from "../../../../../lib/api";
-import { Button } from "../../../../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../../components/ui/card";
-import { Input } from "../../../../../components/ui/input";
-import { IconSearch, IconEdit, IconTrash, IconUser, IconCheck, IconX } from "@tabler/icons-react";
+import { useAuth } from "@/lib/auth-context";
+import { useDictionary } from "@/lib/hooks/useDictionary";
+import { getUsers, updateUser, deleteUser } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { 
+  IconSearch, 
+  IconEdit, 
+  IconTrash, 
+  IconUser, 
+  IconCheck, 
+  IconX,
+  IconSwitch
+} from "@tabler/icons-react";
 
 interface User {
   _id: string;
@@ -20,6 +28,15 @@ interface User {
   lastName?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface EditUserData {
+  username: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role: "customer" | "admin";
+  isActive: boolean;
 }
 
 export default function AdminUsersPage() {
@@ -34,6 +51,15 @@ export default function AdminUsersPage() {
   const [role, setRole] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
   const [refresh, setRefresh] = useState(0);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editForm, setEditForm] = useState<EditUserData>({
+    username: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    role: "customer",
+    isActive: true,
+  });
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -80,6 +106,42 @@ export default function AdminUsersPage() {
     const newRole = currentRole === "admin" ? "customer" : "admin";
     await updateUser(userId, { role: newRole });
     setRefresh((r) => r + 1);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setEditForm({
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      role: user.role,
+      isActive: user.isActive,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingUser) return;
+    
+    try {
+      await updateUser(editingUser._id, editForm);
+      setEditingUser(null);
+      setRefresh((r) => r + 1);
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUser(null);
+    setEditForm({
+      username: "",
+      email: "",
+      firstName: "",
+      lastName: "",
+      role: "customer",
+      isActive: true,
+    });
   };
 
   if (loading) {
@@ -193,9 +255,19 @@ export default function AdminUsersPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleChangeRole(u._id, u.role)}
+                          onClick={() => handleEditUser(u)}
+                          className="text-blue-600 hover:text-blue-700"
                         >
                           <IconEdit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleChangeRole(u._id, u.role)}
+                          className="text-purple-600 hover:text-purple-700"
+                          title={u.role === "admin" ? "Make Customer" : "Make Admin"}
+                        >
+                          <IconSwitch className="w-4 h-4" />
                         </Button>
                         <Button
                           size="sm"
@@ -217,6 +289,101 @@ export default function AdminUsersPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de edición */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Edit User</h3>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleCancelEdit}
+              >
+                <IconX className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Username</label>
+                <Input
+                  type="text"
+                  value={editForm.username}
+                  onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <Input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">First Name</label>
+                <Input
+                  type="text"
+                  value={editForm.firstName}
+                  onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Last Name</label>
+                <Input
+                  type="text"
+                  value={editForm.lastName}
+                  onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Role</label>
+                <select
+                  value={editForm.role}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value as "customer" | "admin" })}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                >
+                  <option value="customer">Customer</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Status</label>
+                <select
+                  value={editForm.isActive ? "active" : "inactive"}
+                  onChange={(e) => setEditForm({ ...editForm, isActive: e.target.value === "active" })}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={handleCancelEdit}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveEdit}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

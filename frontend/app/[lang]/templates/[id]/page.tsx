@@ -37,6 +37,7 @@ type Template = {
     _id: string;
     name: string;
     price: number;
+    maxSales?: number;
   };
   ownerId: {
     _id: string;
@@ -253,7 +254,12 @@ export default function TemplateDetailPage() {
 
         {/* Call-to-Action Section */}
         <TemplateCTA 
-          template={template}
+          template={{
+            title: template.title,
+            price: template.price,
+            sales: template.sales,
+            licenseId: template.licenseId
+          }}
           onAddToCart={handleAddToCart}
           addingToCart={addingToCart}
         />

@@ -34,7 +34,7 @@ const orderSchema = new Schema<IOrder>({
   items: [orderItemSchema],
   total: { type: Number, required: true, min: 0 },
   currency: { type: String, default: 'USD' },
-  stripePaymentId: { type: String, required: true },
+  stripePaymentId: { type: String, required: true, unique: true },
   stripeSessionId: { type: String },
   status: { type: String, enum: ['pending', 'completed', 'failed', 'refunded'], default: 'pending' },
   paymentMethod: { type: String, default: 'stripe' },

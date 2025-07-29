@@ -479,5 +479,47 @@ export const en = {
       delete: 'Delete',
       confirmDelete: 'Are you sure you want to delete this user?',
     }
+  },
+  about: {
+    hero: {
+      title: 'About',
+      subtitle: 'CodeSkins',
+      description: 'We\'re passionate about helping developers and businesses create stunning websites quickly and efficiently. Our premium templates are designed to accelerate your development process while maintaining the highest quality standards.',
+    },
+    stats: {
+      templates: 'Templates',
+      downloads: 'Downloads',
+      rating: 'Rating',
+      support: 'Support',
+    },
+    features: {
+      title: 'Why Choose CodeSkins?',
+      subtitle: 'We provide everything you need to create stunning websites quickly and efficiently.',
+      modernDevelopment: {
+        title: 'Modern Development',
+        description: 'Built with the latest technologies including React, Next.js, and TypeScript for optimal performance and developer experience.',
+      },
+      beautifulDesign: {
+        title: 'Beautiful Design',
+        description: 'Carefully crafted templates with modern UI/UX principles, ensuring your projects look professional and engaging.',
+      },
+      fastResponsive: {
+        title: 'Fast & Responsive',
+        description: 'Optimized for speed and mobile-first design, ensuring your websites work perfectly on all devices.',
+      },
+      communityDriven: {
+        title: 'Community Driven',
+        description: 'Built by developers, for developers. Our templates are designed with real-world use cases in mind.',
+      },
+    },
+    mission: {
+      title: 'Our Mission',
+      description1: 'At CodeSkins, we believe that every developer deserves access to high-quality, professional templates that can accelerate their development process. Our mission is to provide the best website templates that combine modern design with clean, maintainable code.',
+      description2: 'Whether you\'re building a portfolio, launching a startup, or creating a corporate website, our templates are designed to help you succeed. We\'re committed to continuous improvement and staying up-to-date with the latest web development trends and technologies.',
+    },
+    contact: {
+      title: 'Get in Touch',
+      description: 'Have questions or suggestions? We\'d love to hear from you!',
+    },
   }
 } as const; 

@@ -289,7 +289,7 @@ export function TemplateInfo({ template, onAddToCart, addingToCart }: TemplateIn
         )}
 
         {/* Availability Indicator */}
-        {template.licenseId?.maxSales && template.licenseId.maxSales > 0 && (
+        {template.licenseId?.maxSales && template.licenseId.maxSales > 0 ? (
           <Card className="bg-gray-50 border-gray-200">
             <CardContent className="p-4">
               <div className="space-y-3">
@@ -304,7 +304,7 @@ export function TemplateInfo({ template, onAddToCart, addingToCart }: TemplateIn
                   }`}>
                     {template.sales >= template.licenseId.maxSales 
                       ? 'Sold Out' 
-                      : `${template.licenseId.maxSales - template.sales}/${template.licenseId.maxSales} remaining`
+                      : `${template.licenseId.maxSales - template.sales} remaining`
                     }
                   </span>
                 </div>
@@ -333,6 +333,22 @@ export function TemplateInfo({ template, onAddToCart, addingToCart }: TemplateIn
                       : 'This template is available for purchase.'
                   }
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-green-50 border-green-200">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-green-600 text-sm font-bold">✓</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-green-900">Unlimited Availability</h4>
+                  <p className="text-sm text-green-700">
+                    This template has unlimited sales and is always available for purchase.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

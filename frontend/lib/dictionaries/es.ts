@@ -502,5 +502,48 @@ export const es = {
       delete: 'Eliminar',
       confirmDelete: '¿Seguro que deseas eliminar este usuario?',
     }
+  },
+
+  about: {
+    hero: {
+      title: 'Acerca de',
+      subtitle: 'CodeSkins',
+      description: 'Somos apasionados por ayudar a desarrolladores y empresas a crear sitios web impresionantes de manera rápida y eficiente. Nuestras plantillas premium están diseñadas para acelerar tu proceso de desarrollo manteniendo los más altos estándares de calidad.',
+    },
+    stats: {
+      templates: 'Plantillas',
+      downloads: 'Descargas',
+      rating: 'Calificación',
+      support: 'Soporte',
+    },
+    features: {
+      title: '¿Por qué elegir CodeSkins?',
+      subtitle: 'Proporcionamos todo lo que necesitas para crear sitios web impresionantes de manera rápida y eficiente.',
+      modernDevelopment: {
+        title: 'Desarrollo Moderno',
+        description: 'Construido con las últimas tecnologías incluyendo React, Next.js y TypeScript para un rendimiento y experiencia de desarrollador óptimos.',
+      },
+      beautifulDesign: {
+        title: 'Diseño Hermoso',
+        description: 'Plantillas cuidadosamente elaboradas con principios modernos de UI/UX, asegurando que tus proyectos se vean profesionales y atractivos.',
+      },
+      fastResponsive: {
+        title: 'Rápido y Responsivo',
+        description: 'Optimizado para velocidad y diseño mobile-first, asegurando que tus sitios web funcionen perfectamente en todos los dispositivos.',
+      },
+      communityDriven: {
+        title: 'Impulsado por la Comunidad',
+        description: 'Construido por desarrolladores, para desarrolladores. Nuestras plantillas están diseñadas pensando en casos de uso reales.',
+      },
+    },
+    mission: {
+      title: 'Nuestra Misión',
+      description1: 'En CodeSkins, creemos que cada desarrollador merece acceso a plantillas profesionales de alta calidad que pueden acelerar su proceso de desarrollo. Nuestra misión es proporcionar las mejores plantillas de sitios web que combinen diseño moderno con código limpio y mantenible.',
+      description2: 'Ya sea que estés construyendo un portafolio, lanzando una startup o creando un sitio web corporativo, nuestras plantillas están diseñadas para ayudarte a tener éxito. Estamos comprometidos con la mejora continua y mantenernos actualizados con las últimas tendencias y tecnologías de desarrollo web.',
+    },
+    contact: {
+      title: 'Ponte en Contacto',
+      description: '¿Tienes preguntas o sugerencias? ¡Nos encantaría saber de ti!',
+    },
   }
 } as const

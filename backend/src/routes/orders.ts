@@ -4,12 +4,17 @@ import { User } from '../models/User'
 import { Template } from '../models/Template'
 
 interface CreateOrderBody {
-  templateId: string
-  amount: number
-  currency?: string
-  stripePaymentId: string
-  stripeSessionId?: string
-  paymentMethod: string
+  items: Array<{
+    templateId: string;
+    title: string;
+    price: number;
+    quantity: number;
+  }>;
+  total: number;
+  currency?: string;
+  stripePaymentId: string;
+  stripeSessionId?: string;
+  paymentMethod: string;
 }
 
 interface UpdateOrderBody {
@@ -26,11 +31,23 @@ export const registerOrderRoutes = (fastify: FastifyInstance): void => {
       schema: {
         body: {
           type: 'object',
-          required: ['templateId', 'amount', 'stripePaymentId', 'paymentMethod'],
+          required: ['items', 'total', 'stripePaymentId', 'paymentMethod'],
           properties: {
-            templateId: { type: 'string' },
-            amount: { type: 'number', minimum: 0 },
-            currency: { type: 'string', default: 'usd' },
+            items: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['templateId', 'title', 'price', 'quantity'],
+                properties: {
+                  templateId: { type: 'string' },
+                  title: { type: 'string' },
+                  price: { type: 'number', minimum: 0 },
+                  quantity: { type: 'number', minimum: 1 }
+                }
+              }
+            },
+            total: { type: 'number', minimum: 0 },
+            currency: { type: 'string', default: 'USD' },
             stripePaymentId: { type: 'string' },
             stripeSessionId: { type: 'string' },
             paymentMethod: { type: 'string' },
@@ -48,14 +65,16 @@ export const registerOrderRoutes = (fastify: FastifyInstance): void => {
           })
         }
 
-        const { templateId, amount, currency = 'usd', stripePaymentId, stripeSessionId, paymentMethod } = request.body
+        const { items, total, currency = 'USD', stripePaymentId, stripeSessionId, paymentMethod } = request.body
 
-        // Verify template exists and get owner info
-        const template = await Template.findById(templateId)
-        if (!template) {
+        // Verify templates exist and get owner info
+        const templateIds = items.map(item => item.templateId);
+        const templates = await Template.find({ _id: { $in: templateIds }, isActive: true });
+        
+        if (templates.length !== items.length) {
           return reply.status(404).send({
             success: false,
-            message: 'Template not found',
+            message: 'Some templates not found or inactive',
           })
         }
 
@@ -77,18 +96,27 @@ export const registerOrderRoutes = (fastify: FastifyInstance): void => {
           })
         }
 
+        // Use the first template's owner as the order owner
+        const ownerId = templates[0]?.ownerId;
+        
+        if (!ownerId) {
+          return reply.status(400).send({
+            success: false,
+            message: 'Template owner not found',
+          })
+        }
+
         const order = new Order({
           customerId: sessionUser.id,
-          templateId,
-          ownerId: template.ownerId,
-          amount,
+          items: items,
+          total,
           currency: currency.toUpperCase(),
           stripePaymentId,
           stripeSessionId,
           status: 'pending',
           paymentMethod,
           customerEmail: customer.email,
-          templateTitle: template.title,
+          ownerId,
         })
 
         await order.save()
@@ -399,7 +427,7 @@ export const registerOrderRoutes = (fastify: FastifyInstance): void => {
             $group: {
               _id: null,
               totalOrders: { $sum: 1 },
-              totalRevenue: { $sum: '$amount' },
+              totalRevenue: { $sum: '$total' },
               pendingOrders: {
                 $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
               },

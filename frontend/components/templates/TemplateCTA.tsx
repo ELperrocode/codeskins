@@ -16,9 +16,11 @@ interface TemplateCTAProps {
   template: {
     title: string;
     price: number;
+    sales: number;
     licenseId?: {
       name: string;
       price: number;
+      maxSales?: number;
     };
   };
   onAddToCart: () => void;
@@ -157,12 +159,42 @@ export function TemplateCTA({ template, onAddToCart, addingToCart }: TemplateCTA
                   <Button
                     size="lg"
                     onClick={onAddToCart}
-                    disabled={addingToCart}
-                    className="w-full bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 text-lg font-semibold"
+                    disabled={
+                      addingToCart || 
+                      !!(template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales)
+                    }
+                    className={`w-full px-8 py-4 text-lg font-semibold ${
+                      template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales
+                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                        : 'bg-primary-600 hover:bg-primary-700 text-white'
+                    }`}
                   >
                     <IconShoppingCart className="w-5 h-5 mr-2" />
-                    {addingToCart ? 'Adding to Cart...' : 'Add to Cart'}
+                    {addingToCart 
+                      ? 'Adding to Cart...' 
+                      : (template.licenseId?.maxSales && template.licenseId.maxSales > 0 && template.sales >= template.licenseId.maxSales)
+                        ? 'Sold Out'
+                        : 'Add to Cart'
+                    }
                   </Button>
+
+                  {/* Availability info */}
+                  {template.licenseId?.maxSales && template.licenseId.maxSales > 0 && (
+                    <div className="text-center">
+                      <p className={`text-sm font-medium ${
+                        template.sales >= template.licenseId.maxSales 
+                          ? 'text-red-600' 
+                          : template.sales >= template.licenseId.maxSales * 0.8 
+                            ? 'text-orange-600' 
+                            : 'text-green-600'
+                      }`}>
+                        {template.sales >= template.licenseId.maxSales 
+                          ? 'This template is sold out'
+                          : `${template.licenseId.maxSales - template.sales} copies remaining`
+                        }
+                      </p>
+                    </div>
+                  )}
 
                   <div className="text-center">
                     <p className="text-sm text-gray-600">

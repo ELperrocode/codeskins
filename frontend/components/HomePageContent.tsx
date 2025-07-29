@@ -63,6 +63,18 @@ interface License {
   isActive: boolean;
 }
 
+interface Template {
+  _id: string;
+  title: string;
+  description: string;
+  previewImages?: string[];
+  price: number;
+  category: string;
+  tags: string[];
+  rating: number;
+  sales: number;
+}
+
 export default function HomePageContent() {
   const router = useRouter();
   const params = useParams();
@@ -71,86 +83,18 @@ export default function HomePageContent() {
   
   const [categories, setCategories] = useState<Array<{ _id: string; name: string; description?: string; imageUrl?: string; templateCount: number; isActive: boolean }>>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  
-  // Sample products for Hero Parallax with real images from Unsplash
-  const products = [
-    {
-      title: "Photography Studio",
-      link: `/${lang}/templates/687aeffc41ae1f1165071489`,
-      thumbnail: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Blog & Magazine",
-      link: `/${lang}/templates/687aeffc41ae1f1165071486`,
-      thumbnail: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Startup Landing Page",
-      link: `/${lang}/templates/687aeffc41ae1f1165071483`,
-      thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Creative Agency",
-      link: `/${lang}/templates/687aeffc41ae1f1165071480`,
-      thumbnail: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Restaurant & Food",
-      link: `/${lang}/templates/687aeffc41ae1f116507147d`,
-      thumbnail: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Corporate Business",
-      link: `/${lang}/templates/687aeffc41ae1f116507147a`,
-      thumbnail: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Portfolio Showcase",
-      link: `/${lang}/templates/687aeffc41ae1f1165071477`,
-      thumbnail: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "E-commerce Store",
-      link: `/${lang}/templates/687aeffc41ae1f1165071474`,
-      thumbnail: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Personal Blog",
-      link: `/${lang}/templates/687aeffc41ae1f1165071471`,
-      thumbnail: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Tech Startup",
-      link: `/${lang}/templates/687aeffc41ae1f116507146e`,
-      thumbnail: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Design Agency",
-      link: `/${lang}/templates/687aeffc41ae1f116507146b`,
-      thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Fitness & Health",
-      link: `/${lang}/templates/687aeffc41ae1f1165071468`,
-      thumbnail: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Education Platform",
-      link: `/${lang}/templates/687aeffc41ae1f1165071465`,
-      thumbnail: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Real Estate",
-      link: `/${lang}/templates/687aeffc41ae1f1165071462`,
-      thumbnail: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center"
-    },
-    {
-      title: "Travel & Tourism",
-      link: `/${lang}/templates/687aeffc41ae1f116507145f`,
-      thumbnail: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop&crop=center"
-    }
-  ];
-  
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
+
+  // Convert templates to products format for HeroParallax
+  const products = templates.map(template => ({
+    title: template.title,
+    link: `/${lang}/templates/${template._id}`,
+    thumbnail: template.previewImages && template.previewImages.length > 0 
+      ? template.previewImages[0] 
+      : "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&h=400&fit=crop&crop=center"
+  }));
+
   const features = [
     {
       icon: <IconRocket className="w-8 h-8" />,
@@ -202,6 +146,27 @@ export default function HomePageContent() {
     };
 
     fetchCategories();
+  }, []);
+
+  // Fetch templates for Hero Parallax from API
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await fetch('/api/templates?limit=15&sort=newest'); // Fetch latest templates
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data?.templates) {
+            setTemplates(data.data.templates);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+      } finally {
+        setTemplatesLoading(false);
+      }
+    };
+
+    fetchTemplates();
   }, []);
 
   const handleCategoryClick = (category: { _id: string; name: string; description?: string; imageUrl?: string; templateCount: number; isActive?: boolean }) => {
