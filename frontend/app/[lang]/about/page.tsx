@@ -1,0 +1,201 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { IconRocket, IconCode, IconPalette, IconUsers, IconStar, IconDownload, IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconMail } from '@tabler/icons-react';
+
+export default function AboutPage() {
+  const features = [
+    {
+      icon: <IconCode className="w-8 h-8" />,
+      title: "Modern Development",
+      description: "Built with the latest technologies including React, Next.js, and TypeScript for optimal performance and developer experience."
+    },
+    {
+      icon: <IconPalette className="w-8 h-8" />,
+      title: "Beautiful Design",
+      description: "Carefully crafted templates with modern UI/UX principles, ensuring your projects look professional and engaging."
+    },
+    {
+      icon: <IconRocket className="w-8 h-8" />,
+      title: "Fast & Responsive",
+      description: "Optimized for speed and mobile-first design, ensuring your websites work perfectly on all devices."
+    },
+    {
+      icon: <IconUsers className="w-8 h-8" />,
+      title: "Community Driven",
+      description: "Built by developers, for developers. Our templates are designed with real-world use cases in mind."
+    }
+  ];
+
+  const stats = [
+    { number: "100+", label: "Templates" },
+    { number: "50K+", label: "Downloads" },
+    { number: "4.9", label: "Rating" },
+    { number: "24/7", label: "Support" }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+      {/* Hero Section */}
+      <section className="relative z-10 pt-20 pb-20">
+        <div className="max-w-7xl relative mx-auto py-20 md:py-32 px-4 w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              About <br />
+              <span className="bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent">
+                CodeSkins
+              </span>
+            </h1>
+            <p className="max-w-3xl mx-auto text-lg md:text-xl text-white/80 mb-10">
+              We're passionate about helping developers and businesses create stunning websites quickly and efficiently. 
+              Our premium templates are designed to accelerate your development process while maintaining the highest quality standards.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="relative z-10 py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
+          >
+            {stats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="text-center"
+              >
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-white/60">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="relative z-10 py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Why Choose CodeSkins?
+            </h2>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
+              We provide everything you need to create stunning websites quickly and efficiently.
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="backdrop-blur-md bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mb-4">
+                      <div className="text-white">
+                        {feature.icon}
+                      </div>
+                    </div>
+                    <CardTitle className="text-white text-xl">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-white/80 text-center">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <section className="relative z-10 py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+              Our Mission
+            </h2>
+            <p className="text-lg text-white/80 leading-relaxed mb-8">
+              At CodeSkins, we believe that every developer deserves access to high-quality, 
+              professional templates that can accelerate their development process. Our mission 
+              is to provide the best website templates that combine modern design with clean, 
+              maintainable code.
+            </p>
+            <p className="text-lg text-white/80 leading-relaxed">
+              Whether you're building a portfolio, launching a startup, or creating a corporate website, 
+              our templates are designed to help you succeed. We're committed to continuous improvement 
+              and staying up-to-date with the latest web development trends and technologies.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="relative z-10 py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
+              Get in Touch
+            </h2>
+            <p className="text-lg text-white/80 mb-8">
+              Have questions or suggestions? We'd love to hear from you!
+            </p>
+            <div className="flex justify-center space-x-6">
+              <a href="mailto:contact@codeskins.com" className="text-white/80 hover:text-primary-300 transition-colors">
+                <IconMail className="w-6 h-6" />
+              </a>
+              <a href="https://github.com/codeskins" className="text-white/80 hover:text-primary-300 transition-colors">
+                <IconBrandGithub className="w-6 h-6" />
+              </a>
+              <a href="https://twitter.com/codeskins" className="text-white/80 hover:text-primary-300 transition-colors">
+                <IconBrandTwitter className="w-6 h-6" />
+              </a>
+              <a href="https://linkedin.com/company/codeskins" className="text-white/80 hover:text-primary-300 transition-colors">
+                <IconBrandLinkedin className="w-6 h-6" />
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+} 
