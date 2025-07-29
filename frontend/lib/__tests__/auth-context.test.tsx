@@ -137,11 +137,11 @@ describe('AuthContext', () => {
     mockGetProfile.mockResolvedValue({
       success: true,
       data: {
-        user: { email: 'saved@example.com', role: 'seller' }
+        user: { email: 'saved@example.com', role: 'admin' }
       }
     });
 
-    const mockUser = { email: 'saved@example.com', role: 'seller' };
+          const mockUser = { email: 'saved@example.com', role: 'admin' };
     localStorage.setItem('user', JSON.stringify(mockUser));
     localStorage.setItem('token', 'saved-token');
 
@@ -149,7 +149,7 @@ describe('AuthContext', () => {
     
     await waitFor(() => {
       expect(screen.getByTestId('user-email')).toHaveTextContent('saved@example.com');
-      expect(screen.getByTestId('user-role')).toHaveTextContent('seller');
+      expect(screen.getByTestId('user-role')).toHaveTextContent('admin');
     });
   });
 }); 

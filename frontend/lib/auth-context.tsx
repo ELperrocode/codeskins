@@ -1,23 +1,28 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login as apiLogin, register as apiRegister, getProfile, logout as apiLogout } from './api';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { login as loginApi, register as registerApi, logout as logoutApi, getProfile } from './api';
+import { showLoginSuccess, showLoginError, showLogoutSuccess, showRegisterSuccess, showRegisterError, handleNetworkError } from './toast';
 
 interface User {
   _id: string;
   username: string;
-  role: 'customer' | 'seller' | 'admin';
+  email: string;
+  role: 'customer' | 'admin';
   isActive: boolean;
+  firstName?: string;
+  lastName?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string, role: 'customer' | 'seller') => Promise<void>;
+  loading: boolean;
+  login: (username: string, password: string) => Promise<boolean>;
+  register: (username: string, email: string, password: string, role: 'customer' | 'admin') => Promise<boolean>;
   logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,87 +36,89 @@ export const useAuth = () => {
 };
 
 interface AuthProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // Check if user is logged in on mount
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Verify session with the server
-        const response = await getProfile();
-        if (response.success && response.data) {
-          setUser(response.data.user);
-        } else {
-          // No valid session
-          setUser(null);
-          localStorage.removeItem('user');
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setUser(null);
-        localStorage.removeItem('user');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  const login = async (username: string, password: string) => {
+  const checkAuth = async () => {
     try {
-      const response = await apiLogin(username, password);
-      if (response.success && response.data) {
-        const { user } = response.data;
-        setUser(user);
-        localStorage.setItem('user', JSON.stringify(user));
+      const response = await getProfile();
+      if (response.success && response.data?.user) {
+        setUser(response.data.user);
       } else {
-        throw new Error(response.message || 'Login failed');
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await loginApi(username, password);
+      if (response.success && response.data?.user) {
+        setUser(response.data.user);
+        showLoginSuccess(response.data.user.username);
+        return true;
+      } else {
+        showLoginError(response.message || 'Login failed');
+        return false;
       }
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      handleNetworkError(error, 'Login failed');
+      return false;
     }
   };
 
-  const register = async (username: string, email: string, password: string, role: 'customer' | 'seller') => {
+  const register = async (username: string, email: string, password: string, role: 'customer' | 'admin'): Promise<boolean> => {
     try {
-      const response = await apiRegister(username, email, password, role);
-      if (response.success && response.data) {
-        const { user } = response.data;
-        setUser(user);
-        localStorage.setItem('user', JSON.stringify(user));
+      const response = await registerApi(username, email, password, role);
+      if (response.success && response.data?.user) {
+        setUser(response.data.user);
+        showRegisterSuccess(response.data.user.username);
+        return true;
       } else {
-        throw new Error(response.message || 'Registration failed');
+        showRegisterError(response.message || 'Registration failed');
+        return false;
       }
     } catch (error) {
       console.error('Registration error:', error);
-      throw error;
+      handleNetworkError(error, 'Registration failed');
+      return false;
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
-      await apiLogout();
+      await logoutApi();
+      setUser(null);
+      showLogoutSuccess();
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
+      // Even if logout API fails, clear local state
       setUser(null);
-      localStorage.removeItem('user');
+      handleNetworkError(error, 'Logout failed');
     }
   };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const value: AuthContextType = {
     user,
-    isLoading,
+    loading,
     login,
     register,
     logout,
+    checkAuth,
   };
 
   return (

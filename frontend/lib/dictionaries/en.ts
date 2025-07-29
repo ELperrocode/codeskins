@@ -1,97 +1,257 @@
 export const en = {
+  nav: {
+    home: 'Home',
+    templates: 'Templates',
+    categories: 'Categories',
+    about: 'About',
+    contact: 'Contact',
+    login: 'Login',
+    register: 'Register',
+    dashboard: 'Dashboard',
+    profile: 'Profile',
+    logout: 'Logout',
+    cart: 'Cart',
+    wishlist: 'Wishlist',
+  },
+  hero: {
+    title: 'Premium Templates for Developers',
+    subtitle: 'Discover high-quality templates and components to accelerate your development',
+    cta: 'Explore Templates',
+    secondaryCta: 'Learn More',
+  },
+  categories: {
+    title: 'Categories',
+    description: 'Manage template categories',
+    stats: {
+      total: 'Total Categories',
+      active: 'Active Categories',
+      templates: 'Total Templates'
+    },
+    actions: {
+      create: 'New Category',
+      edit: 'Edit',
+      delete: 'Delete',
+      activate: 'Activate',
+      deactivate: 'Deactivate'
+    },
+    form: {
+      name: 'Name',
+      description: 'Description',
+      create: 'Create New Category',
+      edit: 'Edit Category',
+      update: 'Update',
+      cancel: 'Cancel'
+    },
+    status: {
+      active: 'Active',
+      inactive: 'Inactive'
+    },
+    empty: {
+      title: 'No categories found',
+      description: 'Create your first category to get started',
+      filterDescription: 'Try adjusting your filters'
+    }
+  },
+  tags: {
+    title: 'Tags',
+    description: 'Manage template tags',
+    stats: {
+      total: 'Total Tags',
+      active: 'Active Tags',
+      templates: 'Total Templates'
+    },
+    actions: {
+      create: 'New Tag',
+      edit: 'Edit',
+      delete: 'Delete',
+      activate: 'Activate',
+      deactivate: 'Deactivate'
+    },
+    form: {
+      name: 'Name',
+      description: 'Description',
+      color: 'Color',
+      create: 'Create New Tag',
+      edit: 'Edit Tag',
+      update: 'Update',
+      cancel: 'Cancel'
+    },
+    status: {
+      active: 'Active',
+      inactive: 'Inactive'
+    },
+    empty: {
+      title: 'No tags found',
+      description: 'Create your first tag to get started',
+      filterDescription: 'Try adjusting your filters'
+    }
+  },
+  templates: {
+    title: 'Featured Templates',
+    subtitle: 'Handpicked templates for your next project',
+    viewAll: 'View All Templates',
+    addToCart: 'Add to Cart',
+    viewTemplate: 'View Template',
+    by: 'by',
+    downloads: 'downloads',
+    rating: 'rating',
+    reviews: 'reviews',
+    price: 'Price',
+    free: 'Free',
+    popular: 'Popular',
+    new: 'New',
+    featured: 'Featured',
+  },
+  filters: {
+    search: 'Search templates...',
+    sortBy: 'Sort by',
+    newest: 'Newest',
+    oldest: 'Oldest',
+    priceLow: 'Price: Low to High',
+    priceHigh: 'Price: High to Low',
+    rating: 'Highest Rated',
+    popular: 'Most Popular',
+    category: 'Category',
+    allCategories: 'All categories',
+    priceRange: 'Price Range',
+    anyPrice: 'Any price',
+    minRating: 'Minimum Rating',
+    anyRating: 'Any rating',
+    stars: 'stars',
+    tags: 'Tags',
+    clear: 'Clear',
+    filters: 'Filters',
+  },
+  cart: {
+    title: 'Shopping Cart',
+    empty: 'Your cart is empty',
+    items: 'items',
+    subtotal: 'Subtotal',
+    total: 'Total',
+    checkout: 'Checkout',
+    continueShopping: 'Continue Shopping',
+    remove: 'Remove',
+    quantity: 'Quantity',
+    license: 'License',
+    personal: 'Personal',
+    commercial: 'Commercial',
+    unlimited: 'Unlimited',
+  },
+  footer: {
+    description: 'Premium templates and components for modern web development',
+    links: 'Quick Links',
+    support: 'Support',
+    legal: 'Legal',
+    social: 'Follow Us',
+    newsletter: 'Newsletter',
+    subscribe: 'Subscribe',
+    email: 'Enter your email',
+    copyright: '© 2024 CodeSkins. All rights reserved.',
+  },
   auth: {
-    login: {
-      title: "Welcome back to CodeSkins",
-      subtitle: "Sign in to your account",
-      username: "Username",
-      password: "Password",
-      submit: "Sign in",
-      loading: "Signing in...",
-      error: "Invalid username or password",
-      noAccount: "Don't have an account?",
-      signUp: "Sign up"
-    },
-    register: {
-      title: "Join CodeSkins",
-      subtitle: "Create your account to get started",
-      email: "Email address",
-      password: "Password",
-      confirmPassword: "Confirm Password",
-      role: "Account Type",
-      customer: "Customer - Buy templates",
-      seller: "Seller - Sell templates",
-      submit: "Create account",
-      loading: "Creating account...",
-      error: "Registration failed. Please try again.",
-      passwordMismatch: "Passwords do not match",
-      hasAccount: "Already have an account?",
-      signIn: "Sign in"
-    },
-    logout: "Logout"
+    login: 'Login',
+    register: 'Register',
+    email: 'Email',
+    password: 'Password',
+    username: 'Username',
+    confirmPassword: 'Confirm Password',
+    forgotPassword: 'Forgot Password?',
+    noAccount: "Don't have an account?",
+    hasAccount: 'Already have an account?',
+    signIn: 'Sign In',
+    signUp: 'Sign Up',
+    logout: 'Logout',
+  },
+  common: {
+    loading: 'Loading...',
+    error: 'Something went wrong',
+    success: 'Success!',
+    cancel: 'Cancel',
+    save: 'Save',
+    edit: 'Edit',
+    delete: 'Delete',
+    view: 'View',
+    close: 'Close',
+    back: 'Back',
+    next: 'Next',
+    previous: 'Previous',
+    submit: 'Submit',
+    reset: 'Reset',
+    search: 'Search',
+    filter: 'Filter',
+    sort: 'Sort',
+    all: 'All',
+    none: 'None',
+    yes: 'Yes',
+    no: 'No',
+    ok: 'OK',
   },
   dashboard: {
-    title: "Welcome to CodeSkins Dashboard",
-    accountStatus: "Account Status",
-    role: "Role",
-    memberSince: "Member Since",
+    title: 'Dashboard',
+    accountStatus: 'Account Status',
+    role: 'Role',
+    memberSince: 'Member Since',
     customer: {
-      title: "Customer Dashboard",
-      description: "Browse and purchase web templates from our marketplace.",
+      title: 'Customer Dashboard',
+      description: 'Manage your purchases and downloads',
       features: [
-        "View available templates",
-        "Purchase templates", 
-        "Download your purchases",
-        "Manage your orders"
-      ]
-    },
-    seller: {
-      title: "Seller Dashboard", 
-      description: "Upload and manage your web templates for sale.",
-      features: [
-        "Upload new templates",
-        "Manage your listings",
-        "View sales analytics", 
-        "Process payments"
+        'View your purchased templates',
+        'Download your templates',
+        'Manage your profile',
+        'View order history'
       ]
     },
     admin: {
-      title: "Admin Dashboard",
-      description: "Manage the entire CodeSkins marketplace.",
+      title: 'Admin Dashboard',
+      description: 'Manage the entire marketplace',
       features: [
-        "Manage users",
-        "Review templates",
-        "Monitor transactions",
-        "System settings"
+        'Manage all users',
+        'Monitor platform analytics',
+        'Handle disputes and support',
+        'Configure platform settings',
+        'Upload and manage templates',
+        'View sales analytics',
+        'Manage orders and licenses',
+        'Track earnings and performance'
       ]
     }
   },
-  errors: {
-    generic: "Something went wrong",
-    network: "Network error. Please try again.",
-    validation: "Please check your input and try again.",
-    unauthorized: "You are not authorized to perform this action.",
-    notFound: "The requested resource was not found."
-  },
   ui: {
-    loading: "Loading...",
-    save: "Save",
-    cancel: "Cancel",
-    delete: "Delete",
-    edit: "Edit",
-    view: "View",
-    back: "Back",
-    next: "Next",
-    previous: "Previous",
-    close: "Close",
-    open: "Open",
-    search: "Search",
-    filter: "Filter",
-    sort: "Sort",
-    refresh: "Refresh",
-    download: "Download",
-    upload: "Upload",
-    select: "Select",
-    required: "Required",
-    optional: "Optional"
+    loading: 'Loading...',
+    error: 'Error',
+    success: 'Success',
+    warning: 'Warning',
+    info: 'Information'
+  },
+  users: {
+    title: 'User Management',
+    description: 'Manage all users and permissions',
+    filters: {
+      search: 'Search by username, email, name...',
+      role: 'Role',
+      status: 'Status',
+      allRoles: 'All Roles',
+      allStatus: 'All Status',
+      admin: 'Admin',
+      customer: 'Customer',
+      active: 'Active',
+      inactive: 'Inactive',
+    },
+    table: {
+      username: 'Username',
+      email: 'Email',
+      role: 'Role',
+      status: 'Status',
+      created: 'Created',
+      actions: 'Actions',
+      noUsers: 'No users found',
+    },
+    actions: {
+      activate: 'Activate',
+      deactivate: 'Deactivate',
+      changeRole: 'Change Role',
+      delete: 'Delete',
+      confirmDelete: 'Are you sure you want to delete this user?',
+    }
   }
 } as const; 
