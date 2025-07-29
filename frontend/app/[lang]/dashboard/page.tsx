@@ -8,24 +8,24 @@ import { Button } from '../../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 
 export default function DashboardPage() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const { t } = useDictionary();
   const params = useParams();
   const lang = params.lang as string;
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!user) {
       router.push(`/${lang}/login`);
     }
-  }, [user, isLoading, router]);
+  }, [user, router]);
 
   const handleLogout = async () => {
     await logout();
     router.push(`/${lang}`);
   };
 
-  if (isLoading) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">{t.ui.loading}</div>
@@ -41,8 +41,6 @@ export default function DashboardPage() {
     switch (user.role) {
       case 'customer':
         return t.dashboard.customer;
-      case 'seller':
-        return t.dashboard.seller;
       case 'admin':
         return t.dashboard.admin;
       default:

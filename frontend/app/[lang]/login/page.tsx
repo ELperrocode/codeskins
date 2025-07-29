@@ -2,121 +2,143 @@
 
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '../../../lib/auth-context';
 import { useDictionary } from '../../../lib/hooks/useDictionary';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Eye, EyeOff } from 'lucide-react';
+import { BackgroundGradient } from '../../../components/ui/aceternity/background-gradient';
+import { BackgroundBeams } from '../../../components/ui/aceternity/background-beams';
+import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const { login } = useAuth();
-  const router = useRouter();
   const { t } = useDictionary();
+  const router = useRouter();
   const params = useParams();
   const lang = params.lang as string;
+  
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
-      await login(username, password);
-      router.push(`/${lang}/dashboard`);
+      const success = await login(formData.username, formData.password);
+      if (success) {
+        router.push(`/${lang}/dashboard`);
+      }
     } catch (error) {
-      setError(t.auth.login.error);
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/5 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-secondary">
-            {t.auth.login.title}
-          </CardTitle>
-          <CardDescription className="text-secondary/70">
-            {t.auth.login.subtitle}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-4">
+    <div className="min-h-screen bg-background">
+      <BackgroundGradient className="fixed inset-0" />
+      <BackgroundBeams className="fixed inset-0" />
+      
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+        <Card className="w-full max-w-md bg-card border-border shadow-xl">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-foreground">
+              Welcome Back
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Sign in to your account to continue
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">{t.auth.login.username}</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your username"
-                />
-              </div>
-
-              <div className="space-y-2 relative">
-                <Label htmlFor="password">{t.auth.login.password}</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="pr-10"
-                />
-                <div
-                  className="absolute inset-y-0 right-0 top-7 flex items-center pr-3 cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-secondary/50" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-secondary/50" />
-                  )}
+                <Label htmlFor="username" className="text-foreground">
+                  Username
+                </Label>
+                <div className="relative">
+                  <IconUser className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    required
+                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                  />
                 </div>
               </div>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? t.auth.login.loading : t.auth.login.submit}
-            </Button>
-
-            <div className="text-center">
-              <p className="text-sm text-secondary/70">
-                {t.auth.login.noAccount}{' '}
-                <Link href={`/${lang}/register`} className="font-medium text-primary hover:text-primary/80">
-                  {t.auth.login.signUp}
-                </Link>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">
+                  Password
+                </Label>
+                <div className="relative">
+                  <IconLock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
+              </div>
+              
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    Signing in...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    Sign In
+                    <IconArrowRight className="w-4 h-4" />
+                  </div>
+                )}
+              </Button>
+            </form>
+            
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{' '}
+                <Button
+                  variant="link"
+                  onClick={() => router.push(`/${lang}/register`)}
+                  className="p-0 h-auto text-primary hover:text-primary/90"
+                >
+                  Sign up here
+                </Button>
               </p>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 } 
