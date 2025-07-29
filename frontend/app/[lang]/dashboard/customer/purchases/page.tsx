@@ -17,9 +17,13 @@ import {
   IconCheck,
   IconX,
   IconClock,
-  IconAlertCircle
+  IconAlertCircle,
+  IconPackage,
+  IconEye,
+  IconArrowRight
 } from '@tabler/icons-react';
 import DownloadButton from '../../../../../components/DownloadButton';
+import ReceiptPDF from '../../../../../components/ReceiptPDF';
 
 interface OrderItem {
   templateId: {
@@ -123,11 +127,7 @@ export default function CustomerPurchasesPage() {
     router.push(`/${lang}/templates/${templateId}`);
   };
 
-  const handleGoToDownloads = () => {
-    router.push(`/${lang}/dashboard/customer/downloads`);
-  };
-
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">{t.ui.loading}</div>
@@ -140,35 +140,49 @@ export default function CustomerPurchasesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/5">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-secondary">My Purchases</h1>
-          <p className="text-secondary/70 mt-2">
-            View and manage your purchased templates
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                My Purchases
+              </h1>
+              <p className="text-lg text-gray-600">
+                View and manage your purchased templates
+              </p>
+            </div>
+            <Button
+              onClick={() => router.push(`/${lang}/templates`)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Browse More Templates
+              <IconArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </div>
 
         {/* Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-card border-border">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Orders</p>
-                  <p className="text-2xl font-bold text-foreground">{orders.length}</p>
+                  <p className="text-sm font-medium text-blue-700">Total Orders</p>
+                  <p className="text-2xl font-bold text-blue-900">{orders.length}</p>
                 </div>
-                <IconShoppingCart className="w-8 h-8 text-primary" />
+                <IconShoppingCart className="w-8 h-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-sm font-medium text-green-700">Total Spent</p>
+                  <p className="text-2xl font-bold text-green-900">
                     {formatCurrency(orders.reduce((sum, order) => sum + order.total, 0))}
                   </p>
                 </div>
@@ -177,30 +191,30 @@ export default function CustomerPurchasesPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-sm font-medium text-purple-700">Completed</p>
+                  <p className="text-2xl font-bold text-purple-900">
                     {orders.filter(order => order.status === 'completed').length}
                   </p>
                 </div>
-                <IconCheck className="w-8 h-8 text-green-600" />
+                <IconCheck className="w-8 h-8 text-purple-600" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Templates</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-sm font-medium text-orange-700">Templates</p>
+                  <p className="text-2xl font-bold text-orange-900">
                     {orders.reduce((sum, order) => sum + order.items.length, 0)}
                   </p>
                 </div>
-                <IconDownload className="w-8 h-8 text-blue-600" />
+                <IconPackage className="w-8 h-8 text-orange-600" />
               </div>
             </CardContent>
           </Card>
@@ -208,30 +222,31 @@ export default function CustomerPurchasesPage() {
 
         {/* Orders List */}
         {orders.length === 0 ? (
-          <Card className="bg-card border-border">
-            <CardContent className="py-12 text-center">
-              <IconShoppingCart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">No Purchases Yet</h3>
-              <p className="text-muted-foreground mb-6">
-                You haven't made any purchases yet. Start exploring our template collection!
+          <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="py-16 text-center">
+              <IconShoppingCart className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-gray-900 mb-3">No Purchases Yet</h3>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                You haven't made any purchases yet. Start exploring our amazing template collection and find the perfect design for your next project!
               </p>
               <Button
                 onClick={() => router.push(`/${lang}/templates`)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
               >
                 Browse Templates
+                <IconArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-6">
             {orders.map((order) => (
-              <Card key={order._id} className="bg-card border-border hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={order._id} className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300">
+                <CardHeader className="border-b border-gray-100">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <CardTitle className="text-foreground">
+                        <CardTitle className="text-xl text-gray-900">
                           Order #{order._id.slice(-8).toUpperCase()}
                         </CardTitle>
                         <Badge 
@@ -242,8 +257,8 @@ export default function CustomerPurchasesPage() {
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </Badge>
                       </div>
-                      <CardDescription className="text-muted-foreground">
-                        <div className="flex items-center gap-4 text-sm">
+                      <CardDescription className="text-gray-600">
+                        <div className="flex items-center gap-6 text-sm">
                           <span className="flex items-center gap-1">
                             <IconCalendar className="w-4 h-4" />
                             {new Date(order.createdAt).toLocaleDateString()}
@@ -253,7 +268,7 @@ export default function CustomerPurchasesPage() {
                             {order.paymentMethod}
                           </span>
                           {order.stripePaymentId && (
-                            <span className="text-xs bg-muted px-2 py-1 rounded">
+                            <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
                               ID: {order.stripePaymentId.slice(-8)}
                             </span>
                           )}
@@ -261,58 +276,61 @@ export default function CustomerPurchasesPage() {
                       </CardDescription>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-foreground">
+                      <p className="text-3xl font-bold text-green-600">
                         {formatCurrency(order.total, order.currency)}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-gray-500">
                         {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                       </p>
                     </div>
                   </div>
                 </CardHeader>
 
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-0">
+                  <div className="divide-y divide-gray-100">
                     {order.items.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-4 flex-1">
-                          {item.templateId?.previewImages && item.templateId.previewImages.length > 0 && (
-                            <img
-                              src={item.templateId.previewImages[0]}
-                              alt={item.title}
-                              className="w-16 h-16 object-cover rounded-md"
-                            />
-                          )}
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-foreground">{item.title}</h4>
-                            <p className="text-sm text-muted-foreground">{item.templateId?.category || 'Template'}</p>
-                            <p className="text-xs text-muted-foreground">
-                              Quantity: {item.quantity} • {formatCurrency(item.price, order.currency)} each
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-foreground">
-                            {formatCurrency(item.price * item.quantity, order.currency)}
-                          </span>
-                          <div className="flex gap-2">
-                            {item.templateId?._id && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleViewTemplate(item.templateId._id)}
-                                className="border-border text-foreground hover:bg-accent"
-                              >
-                                View
-                              </Button>
-                            )}
-                            {order.status === 'completed' && item.templateId?._id && (
-                              <DownloadButton
-                                templateId={item.templateId._id}
-                                templateTitle={item.title}
-                                className="border-border text-foreground hover:bg-accent"
+                      <div key={index} className="p-6 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1">
+                            {item.templateId?.previewImages && item.templateId.previewImages.length > 0 && (
+                              <img
+                                src={item.templateId.previewImages[0]}
+                                alt={item.title}
+                                className="w-20 h-20 object-cover rounded-lg shadow-sm"
                               />
                             )}
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 text-lg">{item.title}</h4>
+                              <p className="text-sm text-gray-600 mb-1">{item.templateId?.category || 'Template'}</p>
+                              <p className="text-xs text-gray-500">
+                                Quantity: {item.quantity} • {formatCurrency(item.price, order.currency)} each
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="font-semibold text-gray-900 text-lg">
+                              {formatCurrency(item.price * item.quantity, order.currency)}
+                            </span>
+                            <div className="flex gap-2">
+                              {item.templateId?._id && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleViewTemplate(item.templateId._id)}
+                                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                >
+                                  <IconEye className="w-4 h-4 mr-1" />
+                                  View
+                                </Button>
+                              )}
+                              {order.status === 'completed' && item.templateId?._id && (
+                                <DownloadButton
+                                  templateId={item.templateId._id}
+                                  templateTitle={item.title}
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                />
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -320,34 +338,14 @@ export default function CustomerPurchasesPage() {
                   </div>
 
                   {/* Order Actions */}
-                  <div className="mt-6 pt-4 border-t border-border">
+                  <div className="p-6 border-t border-gray-100 bg-gray-50">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-6 text-sm text-gray-600">
                         <span>Email: {order.customerEmail}</span>
                         <span>Updated: {new Date(order.updatedAt).toLocaleDateString()}</span>
                       </div>
-                      <div className="flex gap-2">
-                        {order.status === 'completed' && (
-                          <div className="flex gap-2">
-                            {order.items.map((item, index) => (
-                              item.templateId?._id && (
-                                <DownloadButton
-                                  key={index}
-                                  templateId={item.templateId._id}
-                                  templateTitle={item.title}
-                                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                                />
-                              )
-                            ))}
-                          </div>
-                        )}
-                        <Button
-                          variant="outline"
-                          className="border-border text-foreground hover:bg-accent"
-                        >
-                          <IconReceipt className="w-4 h-4 mr-2" />
-                          Receipt
-                        </Button>
+                      <div className="flex gap-3">
+                        <ReceiptPDF order={order} user={user} />
                       </div>
                     </div>
                   </div>
