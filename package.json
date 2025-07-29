@@ -4,21 +4,21 @@
   "description": "CodeSkins - Web Template Marketplace",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
-    "build": "pnpm --filter backend build && pnpm --filter frontend build",
-    "start": "concurrently \"pnpm --filter backend start\" \"pnpm --filter frontend start\"",
-    "test": "pnpm --filter backend test && pnpm --filter frontend test",
-    "test:watch": "concurrently \"pnpm --filter backend test:watch\" \"pnpm --filter frontend test:watch\"",
-    "test:coverage": "pnpm --filter backend test:coverage && pnpm --filter frontend test:coverage",
-    "test:e2e": "pnpm --filter frontend test:e2e",
-    "lint": "pnpm --filter backend lint && pnpm --filter frontend lint",
-    "type-check": "pnpm --filter backend type-check && pnpm --filter frontend type-check",
+    "dev": "concurrently \"pnpm --filter codeskins-backend dev\" \"pnpm --filter codeskins-frontend dev\"",
+    "build": "pnpm --filter codeskins-backend build && pnpm --filter codeskins-frontend build",
+    "start": "concurrently \"pnpm --filter codeskins-backend start\" \"pnpm --filter codeskins-frontend start\"",
+    "test": "pnpm --filter codeskins-backend test && pnpm --filter codeskins-frontend test",
+    "test:watch": "concurrently \"pnpm --filter codeskins-backend test:watch\" \"pnpm --filter codeskins-frontend test:watch\"",
+    "test:coverage": "pnpm --filter codeskins-backend test:coverage && pnpm --filter codeskins-frontend test:coverage",
+    "test:e2e": "pnpm --filter codeskins-frontend test:e2e",
+    "lint": "pnpm --filter codeskins-backend lint && pnpm --filter codeskins-frontend lint",
+    "type-check": "pnpm --filter codeskins-backend type-check && pnpm --filter codeskins-frontend type-check",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:build": "docker-compose build",
     "docker:logs": "docker-compose logs -f",
     "clean": "rm -rf node_modules frontend/node_modules backend/node_modules shared/node_modules frontend/.next backend/dist",
-    "install:all": "pnpm install && pnpm --filter frontend install && pnpm --filter backend install && pnpm --filter shared install"
+    "install:all": "pnpm install && pnpm --filter codeskins-frontend install && pnpm --filter codeskins-backend install && pnpm --filter shared install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
