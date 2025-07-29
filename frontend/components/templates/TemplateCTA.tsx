@@ -17,7 +17,7 @@ interface TemplateCTAProps {
     price: number;
     licenseId?: {
       name: string;
-      maxDownloads: number;
+      price: number;
     };
   };
   onAddToCart: () => void;
@@ -144,10 +144,7 @@ export function TemplateCTA({ template, onAddToCart, addingToCart }: TemplateCTA
                       <div>
                         <h4 className="font-semibold text-blue-900">{template.licenseId.name}</h4>
                         <p className="text-sm text-blue-700">
-                          {template.licenseId.maxDownloads === -1 
-                            ? 'Unlimited downloads included' 
-                            : `${template.licenseId.maxDownloads} downloads included`
-                          }
+                          Unlimited downloads included
                         </p>
                       </div>
                     </div>
