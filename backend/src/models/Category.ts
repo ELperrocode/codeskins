@@ -4,6 +4,7 @@ export interface ICategory extends Document {
   name: string;
   description?: string;
   slug: string;
+  imageUrl?: string; // Hero image for parallax effect
   isActive: boolean;
   templateCount: number;
   createdAt: Date;
@@ -28,6 +29,10 @@ const categorySchema = new Schema<ICategory>({
     required: true,
     unique: true,
     lowercase: true,
+  },
+  imageUrl: {
+    type: String,
+    trim: true,
   },
   isActive: {
     type: Boolean,

@@ -8,6 +8,7 @@ interface CreateCategoryBody {
   name: string;
   description?: string;
   color?: string;
+  imageUrl?: string;
 }
 
 interface UpdateCategoryBody {
@@ -16,6 +17,7 @@ interface UpdateCategoryBody {
   isActive?: boolean;
   color?: string;
   slug?: string;
+  imageUrl?: string;
 }
 
 interface CategoryRequest extends FastifyRequest {
@@ -33,10 +35,26 @@ export const registerCategoryRoutes = (fastify: FastifyInstance): void => {
         filter.isActive = true;
       }
 
+      // Get categories
       const categories = await Category.find(filter)
         .sort({ templateCount: -1, name: 1 });
 
-      return { success: true, data: { categories } };
+      // Calculate actual template counts for each category
+      const categoriesWithRealCounts = await Promise.all(
+        categories.map(async (category) => {
+          const templateCount = await Template.countDocuments({ 
+            category: category.name,
+            isActive: true 
+          });
+          
+          return {
+            ...category.toObject(),
+            templateCount
+          };
+        })
+      );
+
+      return { success: true, data: { categories: categoriesWithRealCounts } };
     } catch (error) {
       reply.status(500).send({ success: false, message: 'Error fetching categories', error: (error as Error).message });
     }
