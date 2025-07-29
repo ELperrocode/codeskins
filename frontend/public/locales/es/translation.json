@@ -148,7 +148,10 @@
       "noAccount": "¿No tienes una cuenta?",
       "signUp": "Regístrate",
       "loginButton": "Iniciar Sesión",
-      "loggingIn": "Iniciando sesión..."
+      "loggingIn": "Iniciando sesión...",
+      "usernameRequired": "El nombre de usuario es requerido",
+      "passwordRequired": "La contraseña es requerida",
+      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres"
     },
     "register": {
       "title": "Crear Cuenta",

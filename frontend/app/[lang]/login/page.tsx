@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '../../../lib/auth-context';
-import { useDictionary } from '../../../lib/hooks/useDictionary';
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -29,7 +29,7 @@ import { IconUser, IconLock, IconArrowRight, IconEye, IconEyeOff } from '@tabler
 
 export default function LoginPage() {
   const { login, user } = useAuth();
-  const { t } = useDictionary();
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const lang = params.lang as string;
@@ -46,13 +46,13 @@ export default function LoginPage() {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.username.trim()) {
-      newErrors.username = t.auth.errors.usernameRequired;
+      newErrors.username = t('auth.login.usernameRequired');
     }
 
     if (!formData.password) {
-      newErrors.password = t.auth.errors.passwordRequired;
+      newErrors.password = t('auth.login.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = t.auth.errors.passwordMinLength;
+      newErrors.password = t('auth.login.passwordMinLength');
     }
 
     setErrors(newErrors);
@@ -116,12 +116,12 @@ export default function LoginPage() {
             <CardHeader className="text-center">
               <AuthTitle>
                 <CardTitle className="text-3xl font-bold text-text-inverse">
-                  {t.auth.welcomeBack}
+                  {t('auth.login.title')}
                 </CardTitle>
               </AuthTitle>
               <AuthDescription>
                 <CardDescription className="text-lg text-white">
-                  {t.auth.signInDescription}
+                  {t('auth.login.subtitle')}
                 </CardDescription>
               </AuthDescription>
             </CardHeader>
@@ -131,7 +131,7 @@ export default function LoginPage() {
                 <AuthInput delay={0}>
                   <div className="space-y-2">
                     <Label htmlFor="username" className="font-medium">
-                      {t.auth.username}
+                      {t('auth.login.username')}
                     </Label>
                     <div className="relative group">
                       <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
@@ -141,7 +141,7 @@ export default function LoginPage() {
                         id="username"
                         name="username"
                         type="text"
-                        placeholder={t.auth.usernamePlaceholder}
+                        placeholder={t('auth.login.username')}
                         value={formData.username}
                         onChange={handleInputChange}
                         required
@@ -161,7 +161,7 @@ export default function LoginPage() {
                 <AuthInput delay={0.1}>
                   <div className="space-y-2">
                     <Label htmlFor="password" className="font-medium">
-                      {t.auth.password}
+                      {t('auth.login.password')}
                     </Label>
                     <div className="relative group">
                       <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
@@ -171,7 +171,7 @@ export default function LoginPage() {
                         id="password"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
-                        placeholder={t.auth.passwordPlaceholder}
+                        placeholder={t('auth.login.password')}
                         value={formData.password}
                         onChange={handleInputChange}
                         required
@@ -209,12 +209,12 @@ export default function LoginPage() {
                       <AuthSpinner>
                         <div className="flex items-center gap-3">
                           <div className="w-5 h-5 border-2 border-text-inverse border-t-transparent rounded-full animate-spin"></div>
-                          <span>{t.auth.signingIn}</span>
+                          <span>{t('auth.login.loggingIn')}</span>
                         </div>
                       </AuthSpinner>
                     ) : (
                       <div className="flex items-center gap-3">
-                        <span>{t.auth.signIn}</span>
+                        <span>{t('auth.login.loginButton')}</span>
                         <IconArrowRight className="w-5 h-5" />
                       </div>
                     )}
@@ -225,13 +225,13 @@ export default function LoginPage() {
               <AuthLink>
                 <div className="mt-8 text-center">
                   <p className="text-white text-base">
-                    {t.auth.noAccount}{' '}
+                    {t('auth.login.noAccount')}{' '}
                     <Button
                       variant="link"
                       onClick={() => router.push(`/${lang}/register`)}
                       className="p-0 h-auto text-primary-400 hover:text-primary-300 font-semibold text-base transition-colors duration-300"
                     >
-                      {t.auth.signUp}
+                      {t('auth.login.signUp')}
                     </Button>
                   </p>
                 </div>

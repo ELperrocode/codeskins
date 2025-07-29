@@ -148,7 +148,10 @@
       "noAccount": "Don't have an account?",
       "signUp": "Sign up",
       "loginButton": "Login",
-      "loggingIn": "Logging in..."
+      "loggingIn": "Logging in...",
+      "usernameRequired": "Username is required",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters"
     },
     "register": {
       "title": "Create Account",
