@@ -90,69 +90,69 @@ export default function AdminAnalyticsPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-secondary">Analytics Dashboard</h1>
-          <p className="text-secondary/70 mt-2">
+          <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+          <p className="text-gray-600 mt-2">
             Comprehensive insights into your platform's performance
           </p>
         </div>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <IconCurrencyDollar className="w-4 h-4 text-green-600" />
+              <CardTitle className="text-sm font-medium text-gray-900">Total Revenue</CardTitle>
+              <IconCurrencyDollar className="w-4 h-4 text-emerald-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-emerald-700">
                 {formatCurrency(analytics?.totalSales || 0)}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600">
                 All time revenue
               </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">Total Orders</CardTitle>
               <IconShoppingCart className="w-4 h-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-blue-700">
                 {analytics?.totalOrders || 0}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600">
                 All time orders
               </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <IconUsers className="w-4 h-4 text-purple-600" />
+              <CardTitle className="text-sm font-medium text-gray-900">Total Users</CardTitle>
+              <IconUsers className="w-4 h-4 text-violet-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-2xl font-bold text-violet-700">
                 {analytics?.totalUsers || 0}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600">
                 Registered users
               </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Templates</CardTitle>
-              <IconTemplate className="w-4 h-4 text-orange-600" />
+              <CardTitle className="text-sm font-medium text-gray-900">Total Templates</CardTitle>
+              <IconTemplate className="w-4 h-4 text-amber-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">
+              <div className="text-2xl font-bold text-amber-700">
                 {analytics?.totalTemplates || 0}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600">
                 Available templates
               </p>
             </CardContent>
@@ -161,18 +161,18 @@ export default function AdminAnalyticsPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Monthly Sales Chart */}
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader>
-              <CardTitle>Monthly Sales</CardTitle>
-              <CardDescription>Revenue trends over the last 12 months</CardDescription>
+              <CardTitle className="text-gray-900">Monthly Sales</CardTitle>
+              <CardDescription className="text-gray-600">Revenue trends over the last 12 months</CardDescription>
             </CardHeader>
             <CardContent>
               {analytics?.monthlySales && analytics.monthlySales.length > 0 ? (
                 <div className="space-y-4">
                   {analytics.monthlySales.map((month, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
                       <div>
-                        <p className="font-medium">
+                        <p className="font-medium text-gray-900">
                           {getMonthName(month._id.month)} {month._id.year}
                         </p>
                         <p className="text-sm text-gray-600">
@@ -180,7 +180,7 @@ export default function AdminAnalyticsPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-green-600">
+                        <p className="font-semibold text-emerald-700">
                           {formatCurrency(month.total)}
                         </p>
                       </div>
@@ -197,24 +197,24 @@ export default function AdminAnalyticsPage() {
           </Card>
 
           {/* Top Selling Templates */}
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader>
-              <CardTitle>Top Selling Templates</CardTitle>
-              <CardDescription>Most popular templates by sales</CardDescription>
+              <CardTitle className="text-gray-900">Top Selling Templates</CardTitle>
+              <CardDescription className="text-gray-600">Most popular templates by sales</CardDescription>
             </CardHeader>
             <CardContent>
               {analytics?.topTemplates && analytics.topTemplates.length > 0 ? (
                 <div className="space-y-4">
                   {analytics.topTemplates.map((template, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
                       <div>
-                        <p className="font-medium">{template.title}</p>
+                        <p className="font-medium text-gray-900">{template.title}</p>
                         <p className="text-sm text-gray-600">
                           {template.category} • {template.sales} sales
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-blue-600">
+                        <p className="font-semibold text-blue-700">
                           {formatCurrency(template.price)}
                         </p>
                         <p className="text-xs text-gray-500">
@@ -236,23 +236,23 @@ export default function AdminAnalyticsPage() {
 
         {/* Recent Orders */}
         {analytics?.recentOrders && analytics.recentOrders.length > 0 && (
-          <Card className="mt-8">
+          <Card className="mt-8 bg-white shadow-sm border border-gray-200">
             <CardHeader>
-              <CardTitle>Recent Orders</CardTitle>
-              <CardDescription>Latest platform activity</CardDescription>
+              <CardTitle className="text-gray-900">Recent Orders</CardTitle>
+              <CardDescription className="text-gray-600">Latest platform activity</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {analytics.recentOrders.slice(0, 10).map((order: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
                     <div>
-                      <p className="font-medium">Order #{order._id?.slice(-6)}</p>
+                      <p className="font-medium text-gray-900">Order #{order._id?.slice(-6)}</p>
                       <p className="text-sm text-gray-600">
                         {order.customerId?.username || 'Unknown'} • {order.items?.length || 0} items
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-green-600">
+                      <p className="font-semibold text-emerald-700">
                         {formatCurrency(order.total || 0)}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -268,12 +268,12 @@ export default function AdminAnalyticsPage() {
 
         {/* Performance Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader>
-              <CardTitle className="text-lg">Average Order Value</CardTitle>
+              <CardTitle className="text-lg text-gray-900">Average Order Value</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">
+              <div className="text-3xl font-bold text-emerald-700">
                 {analytics?.totalOrders && analytics.totalOrders > 0
                   ? formatCurrency(analytics.totalSales / analytics.totalOrders)
                   : formatCurrency(0)
@@ -285,12 +285,12 @@ export default function AdminAnalyticsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader>
-              <CardTitle className="text-lg">Conversion Rate</CardTitle>
+              <CardTitle className="text-lg text-gray-900">Conversion Rate</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-600">
+              <div className="text-3xl font-bold text-blue-700">
                 {analytics?.totalUsers && analytics.totalUsers > 0
                   ? ((analytics.totalOrders / analytics.totalUsers) * 100).toFixed(1)
                   : '0.0'
@@ -302,12 +302,12 @@ export default function AdminAnalyticsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader>
-              <CardTitle className="text-lg">Template Performance</CardTitle>
+              <CardTitle className="text-lg text-gray-900">Template Performance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-600">
+              <div className="text-3xl font-bold text-amber-700">
                 {analytics?.totalTemplates && analytics.totalTemplates > 0
                   ? (analytics.totalSales / analytics.totalTemplates).toFixed(0)
                   : '0'

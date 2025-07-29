@@ -15,7 +15,8 @@ interface License {
   _id: string;
   name: string;
   description: string;
-  maxDownloads: number;
+  price: number;
+  maxSales?: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -24,7 +25,8 @@ interface License {
 interface LicenseForm {
   name: string;
   description: string;
-  maxDownloads: number;
+  price: number;
+  maxSales?: number;
 }
 
 export default function AdminLicensesPage() {
@@ -41,7 +43,8 @@ export default function AdminLicensesPage() {
   const [form, setForm] = useState<LicenseForm>({
     name: '',
     description: '',
-    maxDownloads: 1,
+    price: 0,
+    maxSales: -1,
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -119,7 +122,7 @@ export default function AdminLicensesPage() {
     setForm({
       name: license.name,
       description: license.description,
-      maxDownloads: license.maxDownloads,
+      price: license.price,
     });
     setShowModal(true);
   };
@@ -130,7 +133,7 @@ export default function AdminLicensesPage() {
     setForm({
       name: '',
       description: '',
-      maxDownloads: 1,
+      price: 0,
     });
     setError('');
   };
@@ -210,20 +213,22 @@ export default function AdminLicensesPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Downloads:</span>
-                    <div className="flex items-center gap-1">
-                      <IconDownload className="w-4 h-4 text-primary" />
-                      {license.maxDownloads === -1 ? (
-                        <div className="flex items-center gap-1">
-                          <IconInfinity className="w-4 h-4 text-primary" />
-                          <span className="font-medium text-foreground">Unlimited</span>
-                        </div>
-                      ) : (
-                        <span className="font-medium text-foreground">{license.maxDownloads}</span>
-                      )}
-                    </div>
-                  </div>
+                                                  <div className="flex justify-between items-center">
+                                  <span className="text-muted-foreground">Price:</span>
+                                  <div className="flex items-center gap-1">
+                                    <IconDownload className="w-4 h-4 text-primary" />
+                                    <span className="font-medium text-foreground">${license.price}</span>
+                                  </div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-muted-foreground">Sales Limit:</span>
+                                  <div className="flex items-center gap-1">
+                                    <IconDownload className="w-4 h-4 text-primary" />
+                                    <span className="font-medium text-foreground">
+                                      {license.maxSales === -1 ? 'Unlimited' : `${license.maxSales} sales`}
+                                    </span>
+                                  </div>
+                                </div>
                   
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Status:</span>
@@ -305,22 +310,39 @@ export default function AdminLicensesPage() {
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Max Downloads</label>
-                  <Input
-                    name="maxDownloads"
-                    type="number"
-                    value={form.maxDownloads}
-                    onChange={handleChange}
-                    placeholder="1"
-                    min="-1"
-                    required
-                    className="border-border bg-background text-foreground"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Use -1 for unlimited downloads
-                  </p>
-                </div>
+                                                <div>
+                                  <label className="block text-sm font-medium text-foreground mb-2">Price</label>
+                                  <Input
+                                    name="price"
+                                    type="number"
+                                    value={form.price}
+                                    onChange={handleChange}
+                                    placeholder="29.99"
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                    className="border-border bg-background text-foreground"
+                                  />
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Price for this license type
+                                  </p>
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-foreground mb-2">Sales Limit</label>
+                                  <Input
+                                    name="maxSales"
+                                    type="number"
+                                    value={form.maxSales}
+                                    onChange={handleChange}
+                                    placeholder="-1"
+                                    min="-1"
+                                    required
+                                    className="border-border bg-background text-foreground"
+                                  />
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Maximum sales allowed (-1 for unlimited)
+                                  </p>
+                                </div>
 
                 {error && (
                   <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">

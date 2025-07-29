@@ -98,8 +98,8 @@ export default function AdminUsersPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-secondary">User Management</h1>
-          <p className="text-secondary/70 mt-2">Manage all users and permissions</p>
+          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+          <p className="text-gray-600 mt-2">Manage all users and permissions</p>
         </div>
         {/* Filtros */}
         <Card className="mb-6">

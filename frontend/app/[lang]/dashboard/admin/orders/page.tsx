@@ -12,7 +12,7 @@ import { IconSearch, IconFilter, IconEye, IconDownload, IconRefresh } from '@tab
 
 interface Order {
   _id: string;
-  customerId: {
+  customerId?: {
     _id: string;
     username: string;
     email: string;
@@ -76,7 +76,7 @@ export default function AdminOrdersPage() {
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 
-      order.customerId.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customerId?.username?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
       order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.items.some(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
@@ -125,52 +125,52 @@ export default function AdminOrdersPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-secondary">Manage Orders</h1>
-          <p className="text-secondary/70 mt-2">
+          <h1 className="text-3xl font-bold text-gray-900">Manage Orders</h1>
+          <p className="text-gray-600 mt-2">
             Monitor and manage all orders on the platform
           </p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <IconDownload className="w-4 h-4 text-green-600" />
+              <CardTitle className="text-sm font-medium text-gray-900">Total Revenue</CardTitle>
+              <IconDownload className="w-4 h-4 text-emerald-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-emerald-700">
                 ${getTotalRevenue().toFixed(2)}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600">
                 From completed orders
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-900">Total Orders</CardTitle>
               <IconRefresh className="w-4 h-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-blue-700">
                 {getTotalOrders()}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600">
                 All time orders
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white shadow-sm border border-gray-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Orders</CardTitle>
-              <IconEye className="w-4 h-4 text-purple-600" />
+              <CardTitle className="text-sm font-medium text-gray-900">Completed Orders</CardTitle>
+              <IconEye className="w-4 h-4 text-violet-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-2xl font-bold text-violet-700">
                 {getCompletedOrders()}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-600">
                 Successfully processed
               </p>
             </CardContent>
@@ -221,29 +221,21 @@ export default function AdminOrdersPage() {
         {/* Orders List */}
         <div className="space-y-4">
           {filteredOrders.map((order) => (
-            <Card key={order._id} className="hover:shadow-lg transition-shadow">
+            <Card key={order._id} className="hover:shadow-lg transition-shadow bg-white shadow-sm border border-gray-200">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">
+                    <CardTitle className="text-lg text-gray-900">
                       Order #{order._id.slice(-6)}
                     </CardTitle>
-                    <CardDescription>
-                      {order.customerId.username} ({order.customerEmail})
+                    <CardDescription className="text-gray-600">
+                      {order.customerId?.username || 'Unknown User'} ({order.customerEmail})
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
                       {order.status}
                     </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => router.push(`/${lang}/dashboard/admin/orders/${order._id}`)}
-                    >
-                      <IconEye className="w-4 h-4 mr-1" />
-                      View Details
-                    </Button>
                   </div>
                 </div>
               </CardHeader>
@@ -251,17 +243,17 @@ export default function AdminOrdersPage() {
                 <div className="space-y-4">
                   {/* Order Items */}
                   <div>
-                    <h4 className="font-medium mb-2">Items:</h4>
+                    <h4 className="font-medium mb-2 text-gray-900">Items:</h4>
                     <div className="space-y-2">
                       {order.items.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded border border-gray-100">
                           <div>
-                            <p className="font-medium">{item.title}</p>
+                            <p className="font-medium text-gray-900">{item.title}</p>
                             <p className="text-sm text-gray-600">
                               Quantity: {item.quantity} × ${item.price}
                             </p>
                           </div>
-                          <p className="font-semibold">
+                          <p className="font-semibold text-gray-900">
                             ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
                           </p>
                         </div>
@@ -270,24 +262,24 @@ export default function AdminOrdersPage() {
                   </div>
 
                   {/* Order Details */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
                     <div>
                       <p className="text-sm text-gray-600">Total</p>
-                      <p className="font-semibold">${(order.total || 0).toFixed(2)}</p>
+                      <p className="font-semibold text-gray-900">${(order.total || 0).toFixed(2)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Payment Method</p>
-                      <p className="font-medium capitalize">{order.paymentMethod}</p>
+                      <p className="font-medium capitalize text-gray-900">{order.paymentMethod}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Created</p>
-                      <p className="font-medium">
+                      <p className="font-medium text-gray-900">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Payment ID</p>
-                      <p className="font-mono text-xs">
+                      <p className="font-mono text-xs text-gray-900">
                         {order.stripePaymentId.slice(-8)}
                       </p>
                     </div>

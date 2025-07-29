@@ -8,13 +8,14 @@ import { Button } from '../../../../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../../../components/ui/card';
 import { Input } from '../../../../../components/ui/input';
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../../../../../lib/api';
-import { IconPlus, IconEdit, IconTrash, IconSearch, IconFilter, IconRefresh } from '@tabler/icons-react';
+import { IconPlus, IconEdit, IconTrash, IconSearch, IconFilter, IconRefresh, IconPhoto } from '@tabler/icons-react';
 
 interface Category {
   _id: string;
   name: string;
   description?: string;
   slug: string;
+  imageUrl?: string;
   isActive: boolean;
   templateCount: number;
   createdAt: string;
@@ -33,7 +34,7 @@ export default function AdminCategoriesPage() {
   const [showActiveOnly, setShowActiveOnly] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [formData, setFormData] = useState({ name: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', description: '', imageUrl: '' });
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== 'admin')) {
@@ -71,7 +72,7 @@ export default function AdminCategoriesPage() {
       const response = await createCategory(formData);
       if (response.success) {
         setShowCreateModal(false);
-        setFormData({ name: '', description: '' });
+        setFormData({ name: '', description: '', imageUrl: '' });
         // Refresh categories
         const refreshResponse = await getCategories({ active: showActiveOnly });
         if (refreshResponse.success && refreshResponse.data?.categories) {
@@ -91,7 +92,7 @@ export default function AdminCategoriesPage() {
       const response = await updateCategory(editingCategory._id, formData);
       if (response.success) {
         setEditingCategory(null);
-        setFormData({ name: '', description: '' });
+        setFormData({ name: '', description: '', imageUrl: '' });
         // Refresh categories
         const refreshResponse = await getCategories({ active: showActiveOnly });
         if (refreshResponse.success && refreshResponse.data?.categories) {
@@ -122,7 +123,7 @@ export default function AdminCategoriesPage() {
 
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
-    setFormData({ name: category.name, description: category.description || '' });
+    setFormData({ name: category.name, description: category.description || '', imageUrl: category.imageUrl || '' });
   };
 
   const handleToggleActive = async (category: Category) => {
@@ -156,8 +157,8 @@ export default function AdminCategoriesPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-secondary">Manage Categories</h1>
-          <p className="text-secondary/70 mt-2">
+          <h1 className="text-3xl font-bold text-gray-900">Manage Categories</h1>
+          <p className="text-gray-600 mt-2">
             Create and manage template categories
           </p>
         </div>
@@ -241,46 +242,91 @@ export default function AdminCategoriesPage() {
         {/* Categories List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCategories.map((category) => (
-            <Card key={category._id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
+            <Card key={category._id} className="hover:shadow-lg transition-shadow overflow-hidden group">
+              {/* Category Image */}
+              <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                {category.imageUrl ? (
+                  <img
+                    src={category.imageUrl}
+                    alt={category.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-center">
+                      <IconPhoto className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No image</p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Status Badge Overlay */}
+                <div className="absolute top-3 right-3">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium shadow-sm ${
+                    category.isActive 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-gray-500 text-white'
+                  }`}>
+                    {category.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+
+                {/* Template Count Overlay */}
+                <div className="absolute bottom-3 left-3">
+                  <div className="bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    {category.templateCount} templates
+                  </div>
+                </div>
+              </div>
+
+              <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{category.name}</CardTitle>
-                    <CardDescription>
-                      {category.description || 'No description'}
+                    <CardTitle className="text-lg text-gray-900">{category.name}</CardTitle>
+                    <CardDescription className="text-gray-600 mt-1">
+                      {category.description || 'No description provided'}
                     </CardDescription>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      category.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {category.isActive ? 'Active' : 'Inactive'}
-                    </span>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
+
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  {/* Slug */}
+                  <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-600">Slug:</span>
-                    <span className="font-mono text-xs">{category.slug}</span>
+                    <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                      {category.slug}
+                    </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Templates:</span>
-                    <span className="font-semibold">{category.templateCount}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
+
+                  {/* Created Date */}
+                  <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-600">Created:</span>
-                    <span>{new Date(category.createdAt).toLocaleDateString()}</span>
+                    <span className="text-gray-900">
+                      {new Date(category.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {/* Image Status */}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Hero Image:</span>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      category.imageUrl 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {category.imageUrl ? 'Set' : 'Not set'}
+                    </span>
                   </div>
                   
-                  <div className="flex gap-2 pt-2">
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 pt-3 border-t border-gray-100">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleEdit(category)}
+                      className="flex-1"
                     >
                       <IconEdit className="w-4 h-4 mr-1" />
                       Edit
@@ -289,6 +335,7 @@ export default function AdminCategoriesPage() {
                       size="sm"
                       variant="outline"
                       onClick={() => handleToggleActive(category)}
+                      className="flex-1"
                     >
                       {category.isActive ? 'Deactivate' : 'Activate'}
                     </Button>
@@ -297,7 +344,7 @@ export default function AdminCategoriesPage() {
                       variant="outline"
                       onClick={() => handleDelete(category._id)}
                       disabled={category.templateCount > 0}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 flex-1"
                     >
                       <IconTrash className="w-4 h-4 mr-1" />
                       Delete
@@ -354,6 +401,19 @@ export default function AdminCategoriesPage() {
                       className="w-full border-border bg-background text-foreground"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Hero Image URL</label>
+                    <Input
+                      type="url"
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                      placeholder="https://example.com/image.jpg (optional)"
+                      className="w-full border-border bg-background text-foreground"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Image for parallax hero effect. Should be high-quality and match the category theme.
+                    </p>
+                  </div>
                   <div className="flex gap-3 pt-4">
                     <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">
                       Create Category
@@ -403,6 +463,19 @@ export default function AdminCategoriesPage() {
                       placeholder="Enter category description (optional)"
                       className="w-full border-border bg-background text-foreground"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Hero Image URL</label>
+                    <Input
+                      type="url"
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                      placeholder="https://example.com/image.jpg (optional)"
+                      className="w-full border-border bg-background text-foreground"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Image for parallax hero effect. Should be high-quality and match the category theme.
+                    </p>
                   </div>
                   <div className="flex gap-3 pt-4">
                     <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">

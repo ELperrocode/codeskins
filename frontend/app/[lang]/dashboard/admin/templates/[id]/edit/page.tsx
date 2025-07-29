@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { useDictionary } from "@/lib/hooks/useDictionary";
 import { getTemplate, updateTemplate, getCategories, getTags, getLicenses } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,13 +27,11 @@ interface License {
   name: string;
   description: string;
   price: number;
-  maxDownloads: number;
 }
 
 export default function AdminTemplateEditPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const { t } = useDictionary();
   const params = useParams();
   const lang = params.lang as string;
   const templateId = params.id as string;
@@ -46,10 +43,11 @@ export default function AdminTemplateEditPage() {
     category: '',
     tags: [] as string[],
     fileUrl: '',
+    previewUrl: '',
     licenseId: '',
-    maxDownloads: '',
     status: 'draft' as 'draft' | 'active' | 'inactive',
     previewImages: [] as string[],
+    features: [] as string[],
   });
   
   const [categories, setCategories] = useState<Category[]>([]);
@@ -58,6 +56,7 @@ export default function AdminTemplateEditPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [initialLoading, setInitialLoading] = useState(true);
+  const [newFeature, setNewFeature] = useState('');
 
   // Fetch categories, tags, and licenses
   useEffect(() => {
@@ -100,11 +99,12 @@ export default function AdminTemplateEditPage() {
             price: template.price.toString(),
             category: template.category,
             tags: template.tags || [],
-            fileUrl: template.fileUrl,
+            fileUrl: template.fileUrl || '',
+            previewUrl: template.previewUrl || '',
             licenseId: template.licenseId?._id || '',
-            maxDownloads: template.maxDownloads?.toString() || '',
             status: template.status,
             previewImages: template.previewImages || [],
+            features: template.features || [],
           });
         }
       } catch (err: any) {
@@ -133,6 +133,17 @@ export default function AdminTemplateEditPage() {
     }
   };
 
+  const handleAddFeature = () => {
+    if (newFeature.trim() && !form.features.includes(newFeature.trim())) {
+      setForm(prev => ({ ...prev, features: [...prev.features, newFeature.trim()] }));
+      setNewFeature('');
+    }
+  };
+
+  const handleRemoveFeature = (featureToRemove: string) => {
+    setForm(prev => ({ ...prev, features: prev.features.filter(f => f !== featureToRemove) }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -141,9 +152,9 @@ export default function AdminTemplateEditPage() {
       const payload = {
         ...form,
         price: parseFloat(form.price),
-        maxDownloads: form.maxDownloads ? parseInt(form.maxDownloads) : -1,
         previewImages: form.previewImages,
         status: form.status,
+        features: form.features,
       };
       const response = await updateTemplate(templateId, payload);
       if (response.success) {
@@ -227,15 +238,12 @@ export default function AdminTemplateEditPage() {
                   <option value="">Select a license</option>
                   {licenses.map(license => (
                     <option key={license._id} value={license._id}>
-                      {license.name} - ${license.price} ({license.maxDownloads === -1 ? 'Unlimited' : license.maxDownloads} downloads)
+                      {license.name} - ${license.price}
                     </option>
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Max Downloads (-1 = unlimited)</label>
-                <Input name="maxDownloads" type="number" value={form.maxDownloads} onChange={handleChange} />
-              </div>
+
             </div>
             
             <div>
@@ -255,19 +263,57 @@ export default function AdminTemplateEditPage() {
               </div>
             </div>
             
+            <div>
+              <label className="block text-sm font-medium mb-1">Features</label>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Input
+                    value={newFeature}
+                    onChange={(e) => setNewFeature(e.target.value)}
+                    placeholder="Add a feature..."
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddFeature())}
+                  />
+                  <Button type="button" onClick={handleAddFeature} variant="outline">
+                    Add
+                  </Button>
+                </div>
+                {form.features.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {form.features.map((feature, index) => (
+                      <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                        <span>{feature}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFeature(feature)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Max Downloads (-1 = unlimited)</label>
-                <Input name="maxDownloads" type="number" value={form.maxDownloads} onChange={handleChange} />
+                <label className="block text-sm font-medium mb-1">File URL</label>
+                <Input name="fileUrl" value={form.fileUrl} onChange={handleChange} placeholder="https://..." />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
-                <select name="status" value={form.status} onChange={handleChange} className="w-full border rounded p-2">
-                  <option value="draft">Draft</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                <label className="block text-sm font-medium mb-1">Preview URL (optional)</label>
+                <Input name="previewUrl" value={form.previewUrl} onChange={handleChange} placeholder="https://..." />
               </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">Status</label>
+              <select name="status" value={form.status} onChange={handleChange} className="w-full border rounded p-2">
+                <option value="draft">Draft</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
             </div>
             
             <div>
