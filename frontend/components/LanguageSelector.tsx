@@ -13,13 +13,8 @@ export function LanguageSelector() {
   const params = useParams();
   const router = useRouter();
   const currentLang = params.lang as string;
-  const { changeLanguage } = useTranslation();
 
   const handleLanguageChange = (langCode: string) => {
-    // Change the i18n language
-    changeLanguage(langCode);
-    
-    // Get the current path and replace the language part
     const currentPath = window.location.pathname;
     const pathWithoutLang = currentPath.replace(`/${currentLang}`, '');
     const newPath = `/${langCode}${pathWithoutLang}`;
@@ -27,17 +22,21 @@ export function LanguageSelector() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       {supportedLanguages.map((lang) => (
         <Button
           key={lang.code}
-          variant={currentLang === lang.code ? 'default' : 'outline'}
+          variant={currentLang === lang.code ? 'default' : 'ghost'}
           size="sm"
           onClick={() => handleLanguageChange(lang.code)}
-          className="flex items-center gap-1"
+          className={`h-8 w-8 p-0 rounded-full transition-all duration-200 hover:scale-110 ${
+            currentLang === lang.code 
+              ? 'bg-yellow-400 text-black shadow-md' 
+              : 'bg-white/10 text-white hover:bg-white/20'
+          }`}
+          title={lang.name}
         >
-          <span>{lang.flag}</span>
-          <span className="hidden sm:inline">{lang.name}</span>
+          <span className="text-sm">{lang.flag}</span>
         </Button>
       ))}
     </div>

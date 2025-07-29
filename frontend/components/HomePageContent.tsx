@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { IconRocket, IconCode, IconPalette, IconUsers, IconStar, IconDownload, IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconMail, IconHeart } from '@tabler/icons-react';
 import { useTranslation } from '../lib/hooks/useTranslation';
+import LicensesSection from './LicensesSection';
 
 // FAQ Accordion Component
 const FAQAccordion = ({ question, answer, index }: { question: string; answer: string; index: number }) => {
@@ -68,8 +69,6 @@ export default function HomePageContent() {
   const lang = params.lang as string;
   const { t } = useTranslation();
   
-  const [licenses, setLicenses] = useState<License[]>([]);
-  const [licensesLoading, setLicensesLoading] = useState(true);
   const [categories, setCategories] = useState<Array<{ _id: string; name: string; description?: string; imageUrl?: string; templateCount: number; isActive: boolean }>>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   
@@ -154,54 +153,35 @@ export default function HomePageContent() {
   
   const features = [
     {
-      icon: <IconCode className="w-8 h-8" />,
-      title: "Premium Templates",
-      description: "High-quality, responsive website templates for every industry"
+      icon: <IconRocket className="w-8 h-8" />,
+      title: t('landing.features.rapidDevelopment.title'),
+      description: t('landing.features.rapidDevelopment.description')
+    },
+    {
+      icon: <IconStar className="w-8 h-8" />,
+      title: t('landing.features.premiumQuality.title'),
+      description: t('landing.features.premiumQuality.description')
     },
     {
       icon: <IconPalette className="w-8 h-8" />,
-      title: "Customizable Design",
-      description: "Easy to customize with modern design tools and frameworks"
+      title: t('landing.features.easyCustomization.title'),
+      description: t('landing.features.easyCustomization.description')
     },
     {
-      icon: <IconRocket className="w-8 h-8" />,
-      title: "Fast Development",
-      description: "Get your website up and running in minutes, not hours"
-    },
-    {
-      icon: <IconUsers className="w-8 h-8" />,
-      title: "Community Support",
-      description: "Join our community of developers and designers"
+      icon: <IconCode className="w-8 h-8" />,
+      title: t('landing.features.developerFriendly.title'),
+      description: t('landing.features.developerFriendly.description')
     }
   ];
 
   const stats = [
-    { number: "500+", label: "Templates" },
-    { number: "10K+", label: "Downloads" },
-    { number: "5K+", label: "Happy Customers" },
-    { number: "4.9", label: "Rating" }
+    { number: "500+", label: t('landing.stats.templates') },
+    { number: "10K+", label: t('landing.stats.downloads') },
+    { number: "5K+", label: t('landing.stats.developers') },
+    { number: "50+", label: t('landing.stats.countries') }
   ];
 
-  // Fetch licenses from API
-  useEffect(() => {
-    const fetchLicenses = async () => {
-      try {
-        const response = await fetch('/api/licenses');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.data?.licenses) {
-            setLicenses(data.data.licenses);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching licenses:', error);
-      } finally {
-        setLicensesLoading(false);
-      }
-    };
 
-    fetchLicenses();
-  }, []);
 
   // Fetch categories with images from API
   useEffect(() => {
@@ -276,10 +256,10 @@ export default function HomePageContent() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Why Choose CodeSkins?
+              {t('landing.features.title')}
             </h2>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              We provide everything you need to create stunning websites quickly and efficiently.
+              {t('landing.features.subtitle')}
             </p>
           </motion.div>
           
@@ -324,10 +304,10 @@ export default function HomePageContent() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              What Our Customers Say
+              {t('landing.testimonials.title')}
             </h2>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Join thousands of satisfied developers and designers who trust CodeSkins.
+              {t('landing.testimonials.subtitle')}
             </p>
           </motion.div>
           
@@ -481,138 +461,7 @@ export default function HomePageContent() {
       </section>
 
       {/* Licenses Section */}
-      <section className="relative z-10 py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Available Licenses
-            </h2>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Choose the license type that best fits your project needs and usage requirements.
-            </p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {licensesLoading ? (
-              // Loading skeleton
-              Array.from({ length: 3 }).map((_, index) => (
-                <motion.div
-                  key={`skeleton-${index}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <Card className="backdrop-blur-md bg-white/10 border-white/20 h-full">
-                    <CardHeader className="text-center">
-                      <div className="h-6 bg-white/20 rounded animate-pulse mb-4"></div>
-                      <div className="h-4 bg-white/10 rounded animate-pulse mb-2"></div>
-                      <div className="h-8 bg-white/20 rounded animate-pulse"></div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <div key={i} className="h-4 bg-white/10 rounded animate-pulse"></div>
-                        ))}
-                      </div>
-                      <div className="h-10 bg-white/20 rounded animate-pulse mt-6"></div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))
-            ) : licenses.length > 0 ? (
-              licenses.map((license, index) => {
-                // Generate features based on license data
-                const features = [
-                  "Unlimited downloads",
-                  
-                  license.name.includes('Extended') || license.name.includes('Developer') || license.name.includes('Premium') ? "Commercial use" : "Personal use",
-                  
-                  license.name.includes('Developer') ? "Client projects" : 
-                  license.name.includes('Extended') || license.name.includes('Premium') ? "Multiple projects" : "Single project",
-                  
-                  license.name.includes('Developer') ? "Agency work" : 
-                  license.name.includes('Extended') || license.name.includes('Premium') ? "Resale rights" : "Personal portfolio",
-                  
-                  license.name.includes('Developer') ? "White-label rights" : 
-                  license.name.includes('Extended') || license.name.includes('Premium') ? "Priority support" : "Basic support",
-                  
-                  license.name.includes('Developer') ? "Dedicated support" : 
-                  license.name.includes('Extended') || license.name.includes('Premium') ? "Lifetime updates" : "1 year updates",
-                  
-                  license.maxSales && license.maxSales !== -1 ? `Limited to ${license.maxSales} sales` : "Unlimited sales"
-                ].filter(Boolean);
-
-                const isPopular = license.name.includes('Extended');
-
-                return (
-                  <motion.div
-                    key={license._id || license.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                  >
-                    <Card className={`backdrop-blur-md border-white/20 hover:bg-white/20 transition-all duration-300 h-full relative ${
-                      isPopular ? 'bg-gradient-primary border-primary-400' : 'bg-white/10'
-                    }`}>
-                      {isPopular && (
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                          <span className="bg-primary-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                            Most Popular
-                          </span>
-                        </div>
-                      )}
-                      <CardHeader className="text-center">
-                        <CardTitle className={`text-2xl ${isPopular ? 'text-white' : 'text-white'}`}>
-                          {license.name}
-                        </CardTitle>
-                        <p className={`text-sm ${isPopular ? 'text-white/80' : 'text-white/60'} mt-2`}>
-                          {license.description}
-                        </p>
-                        <div className="mt-4">
-                          <span className={`text-2xl font-semibold ${isPopular ? 'text-white' : 'text-white'}`}>
-                            Unlimited Downloads
-                          </span>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-3">
-                          {features.map((feature, i) => (
-                            <li key={i} className="flex items-center">
-                              <svg className={`w-5 h-5 mr-3 ${isPopular ? 'text-white' : 'text-primary-400'}`} fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                              <span className={isPopular ? 'text-white' : 'text-white/80'}>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <Button 
-                          className={`w-full mt-6 ${isPopular ? 'bg-white text-primary-600 hover:bg-gray-100' : 'bg-primary-500 hover:bg-primary-600'}`}
-                          onClick={() => router.push(`/${lang}/templates`)}
-                        >
-                          Browse Templates
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })
-            ) : (
-              // Fallback if no licenses
-              <div className="col-span-3 text-center text-white/60">
-                <p>No licenses available at the moment.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      <LicensesSection />
 
       {/* FAQ Section */}
       <section className="relative z-10 py-20 px-4">
@@ -625,34 +474,38 @@ export default function HomePageContent() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Frequently Asked Questions
+              {t('landing.faq.title')}
             </h2>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Everything you need to know about CodeSkins templates.
+              {t('landing.faq.subtitle')}
             </p>
           </motion.div>
           
           <div className="space-y-4">
             {[
               {
-                question: "What's included with each template?",
-                answer: "Each template includes the complete source code, documentation, responsive design, and lifetime updates. You also get commercial usage rights and basic support."
+                question: t('landing.faq.questions.0.question'),
+                answer: t('landing.faq.questions.0.answer')
               },
               {
-                question: "Can I customize the templates?",
-                answer: "Absolutely! All templates are fully customizable. You can modify colors, fonts, layouts, and add your own content. The code is clean and well-commented for easy customization."
+                question: t('landing.faq.questions.1.question'),
+                answer: t('landing.faq.questions.1.answer')
               },
               {
-                question: "Do you offer refunds?",
-                answer: "Yes, we offer a 30-day money-back guarantee. If you're not satisfied with your purchase, simply contact us and we'll process your refund."
+                question: t('landing.faq.questions.2.question'),
+                answer: t('landing.faq.questions.2.answer')
               },
               {
-                question: "What technologies do you use?",
-                answer: "Our templates use modern technologies like React, Next.js, Tailwind CSS, and TypeScript. They're built with best practices and are production-ready."
+                question: t('landing.faq.questions.3.question'),
+                answer: t('landing.faq.questions.3.answer')
               },
               {
-                question: "Is there a limit on downloads?",
-                answer: "With the Pro plan, you get unlimited downloads. The Starter plan includes one template download, and Enterprise plans include unlimited access for your entire team."
+                question: t('landing.faq.questions.4.question'),
+                answer: t('landing.faq.questions.4.answer')
+              },
+              {
+                question: t('landing.faq.questions.5.question'),
+                answer: t('landing.faq.questions.5.answer')
               }
             ].map((faq, index) => (
               <FAQAccordion key={index} question={faq.question} answer={faq.answer} index={index} />
@@ -671,10 +524,10 @@ export default function HomePageContent() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to Start Building?
+              {t('landing.cta.title')}
             </h2>
             <p className="text-xl text-white/80 mb-8">
-              Join thousands of developers who trust CodeSkins for their website templates.
+              {t('landing.cta.subtitle')}
             </p>
             <Button
               size="lg"
@@ -682,7 +535,7 @@ export default function HomePageContent() {
               onClick={() => router.push(`/${lang}/templates`)}
             >
               <IconRocket className="w-5 h-5 mr-2" />
-              Get Started Today
+              {t('landing.cta.button')}
             </Button>
           </motion.div>
         </div>
@@ -692,7 +545,7 @@ export default function HomePageContent() {
       <footer className="relative z-10 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             {/* Brand Section */}
             <div className="lg:col-span-2">
               <Link href={`/${lang}`} className="flex items-center space-x-2 mb-4 group">
@@ -702,8 +555,7 @@ export default function HomePageContent() {
                 <span className="font-bold text-xl group-hover:text-primary-400 transition-colors duration-300 text-white drop-shadow-lg">CodeSkins</span>
               </Link>
               <p className="mb-6 max-w-md leading-relaxed text-white/70">
-                Premium website templates and components for modern web development. 
-                Built with the latest technologies and designed for developers who care about quality.
+                {t('footer.description')}
               </p>
               
               {/* Social Links */}
@@ -730,13 +582,13 @@ export default function HomePageContent() {
 
             {/* Product Links */}
             <div>
-              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">Product</h3>
+              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">{t('footer.product')}</h3>
               <ul className="space-y-2">
                 {[
-                  { name: 'Templates', href: `/${lang}/templates` },
-                  { name: 'Categories', href: `/${lang}/templates?category=all` },
-                  { name: 'New Arrivals', href: `/${lang}/templates?sort=newest` },
-                  { name: 'Popular', href: `/${lang}/templates?sort=popular` },
+                  { name: t('footer.templates'), href: `/${lang}/templates` },
+                  { name: t('footer.categories'), href: `/${lang}/templates?category=all` },
+                  { name: t('footer.newArrivals'), href: `/${lang}/templates?sort=newest` },
+                  { name: t('footer.popular'), href: `/${lang}/templates?sort=popular` },
                 ].map((link) => (
                   <li key={link.name}>
                     <Link
@@ -752,31 +604,13 @@ export default function HomePageContent() {
 
             {/* Company Links */}
             <div>
-              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">Company</h3>
+              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">{t('footer.company')}</h3>
               <ul className="space-y-2">
                 {[
-                  { name: 'Login', href: `/${lang}/login` },
-                  { name: 'Register', href: `/${lang}/register` },
-                ].map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      href={link.href}
-                      className="text-white/70 hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Support Links */}
-            <div>
-              <h3 className="font-semibold mb-4 text-lg text-white drop-shadow-sm">Support</h3>
-              <ul className="space-y-2">
-                {[
-                  { name: 'Cart', href: `/${lang}/cart` },
-                  { name: 'Checkout', href: `/${lang}/checkout` },
+                  { name: t('footer.login'), href: `/${lang}/login` },
+                  { name: t('footer.register'), href: `/${lang}/register` },
+                  { name: t('footer.cart'), href: `/${lang}/cart` },
+                  { name: t('footer.checkout'), href: `/${lang}/checkout` },
                 ].map((link) => (
                   <li key={link.name}>
                     <Link
@@ -796,18 +630,18 @@ export default function HomePageContent() {
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               {/* Copyright */}
               <div className="flex items-center space-x-2 text-white/70">
-                <span>&copy; {new Date().getFullYear()} CodeSkins. All rights reserved.</span>
+                <span>&copy; {new Date().getFullYear()} CodeSkins. {t('footer.copyright')}</span>
                 <span className="hidden sm:inline text-white/40">•</span>
-                <span className="hidden sm:inline">Made with</span>
+                <span className="hidden sm:inline">{t('footer.madeWith')}</span>
                 <IconHeart className="w-4 h-4 text-red-400 animate-pulse" />
-                <span className="hidden sm:inline">for developers</span>
+                <span className="hidden sm:inline">{t('footer.forDevelopers')}</span>
               </div>
 
               {/* Legal Links */}
               <div className="flex flex-wrap justify-center md:justify-end space-x-6">
                 {[
-                  { name: 'Terms of Service', href: '#' },
-                  { name: 'Privacy Policy', href: '#' },
+                  { name: t('footer.terms'), href: '#' },
+                  { name: t('footer.privacy'), href: '#' },
                 ].map((link) => (
                   <Link
                     key={link.name}

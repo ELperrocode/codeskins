@@ -5,6 +5,7 @@ import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
+import { useTranslation } from '../../lib/hooks/useTranslation';
 import { 
   IconSearch, 
   IconFilter, 
@@ -46,6 +47,7 @@ export function TemplateFilters({
   clearFilters,
   hasActiveFilters
 }: TemplateFiltersProps) {
+  const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
 
   return (
@@ -60,7 +62,7 @@ export function TemplateFilters({
                   <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <Input
                     type="text"
-                    placeholder="Search templates..."
+                    placeholder={t('filters.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                     className="pl-10 bg-gray-50 border-gray-200 focus:bg-white focus:border-primary-500"
@@ -76,7 +78,7 @@ export function TemplateFilters({
                   className="flex items-center gap-2"
                 >
                   <IconFilter className="w-4 h-4" />
-                  Filters
+                  {t('filters.filters')}
                   {hasActiveFilters && (
                     <Badge variant="secondary" className="ml-1">
                       {selectedTags.length + (selectedCategory !== 'all' ? 1 : 0) + (priceRange.min > 0 || priceRange.max < 1000 ? 1 : 0)}
@@ -91,7 +93,7 @@ export function TemplateFilters({
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
                   >
                     <IconX className="w-4 h-4" />
-                    Clear
+                    {t('filters.clear')}
                   </Button>
                 )}
               </div>
@@ -107,31 +109,31 @@ export function TemplateFilters({
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                         <IconSortAscending className="w-4 h-4" />
-                        Sort By
+                        {t('filters.sortByLabel')}
                       </label>
                       <select
                         value={sortBy}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value)}
                         className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
                       >
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="rating">Highest Rated</option>
-                        <option value="downloads">Most Downloaded</option>
+                        <option value="newest">{t('filters.newestFirst')}</option>
+                        <option value="oldest">{t('filters.oldestFirst')}</option>
+                        <option value="price-low">{t('filters.priceLowToHigh')}</option>
+                        <option value="price-high">{t('filters.priceHighToLow')}</option>
+                        <option value="rating">{t('filters.highestRated')}</option>
+                        <option value="downloads">{t('filters.mostDownloaded')}</option>
                       </select>
                     </div>
 
                     {/* Category Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('filters.categoryLabel')}</label>
                       <select
                         value={selectedCategory}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedCategory(e.target.value)}
                         className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
                       >
-                        <option value="all">All Categories</option>
+                        <option value="all">{t('filters.allCategories')}</option>
                         {categories.map((category) => (
                           <option key={category} value={category}>
                             {category}
@@ -142,29 +144,29 @@ export function TemplateFilters({
 
                     {/* Price Range */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('filters.priceRangeLabel')}</label>
                       <div className="flex gap-2">
-                        <Input
-                          type="number"
-                          placeholder="Min"
-                          value={priceRange.min}
-                          onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) })}
-                          className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Max"
-                          value={priceRange.max}
-                          onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) })}
-                          className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
-                        />
+                                                  <Input
+                            type="number"
+                            placeholder={t('filters.min')}
+                            value={priceRange.min}
+                            onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) })}
+                            className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                          />
+                          <Input
+                            type="number"
+                            placeholder={t('filters.max')}
+                            value={priceRange.max}
+                            onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) })}
+                            className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                          />
                       </div>
                     </div>
                   </div>
 
                   {/* Second row: Tags - Full width */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Tags</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">{t('filters.tagsLabel')}</label>
                     <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 border border-gray-200 rounded-md bg-gray-50">
                       {tags.map((tag) => (
                         <Badge

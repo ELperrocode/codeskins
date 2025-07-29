@@ -3,14 +3,17 @@ import { toast } from 'sonner';
 // Toast types for different scenarios
 export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'loading';
 
-// Toast configuration
+// Toast configuration with solid backgrounds
 const toastConfig = {
   duration: 4000,
   position: 'top-right' as const,
   style: {
-    background: 'var(--background)',
-    color: 'var(--foreground)',
-    border: '1px solid var(--border)',
+    background: '#ffffff',
+    color: '#1f2937',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    backdropFilter: 'blur(10px)',
   },
 };
 
@@ -19,6 +22,12 @@ export const showSuccess = (message: string, title?: string) => {
   toast.success(title || 'Success', {
     description: message,
     ...toastConfig,
+    style: {
+      ...toastConfig.style,
+      background: '#f0fdf4',
+      border: '1px solid #bbf7d0',
+      color: '#166534',
+    },
   });
 };
 
@@ -28,6 +37,12 @@ export const showError = (message: string, title?: string) => {
     description: message,
     ...toastConfig,
     duration: 6000, // Longer duration for errors
+    style: {
+      ...toastConfig.style,
+      background: '#fef2f2',
+      border: '1px solid #fecaca',
+      color: '#dc2626',
+    },
   });
 };
 
@@ -36,6 +51,12 @@ export const showWarning = (message: string, title?: string) => {
   toast.warning(title || 'Warning', {
     description: message,
     ...toastConfig,
+    style: {
+      ...toastConfig.style,
+      background: '#fffbeb',
+      border: '1px solid #fed7aa',
+      color: '#d97706',
+    },
   });
 };
 
@@ -44,6 +65,12 @@ export const showInfo = (message: string, title?: string) => {
   toast.info(title || 'Info', {
     description: message,
     ...toastConfig,
+    style: {
+      ...toastConfig.style,
+      background: '#eff6ff',
+      border: '1px solid #bfdbfe',
+      color: '#2563eb',
+    },
   });
 };
 

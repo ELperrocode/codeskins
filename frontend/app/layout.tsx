@@ -4,7 +4,6 @@ import './globals.css'
 import { AuthProvider } from '../lib/auth-context'
 import { CartProvider } from '../lib/cart-context'
 import { Toaster } from 'sonner'
-import '../lib/i18n'
 import NavbarWrapper from '../components/ui/NavbarWrapper'
 
 const inter = Inter({ subsets: ['latin'] })

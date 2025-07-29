@@ -8,6 +8,7 @@ import { IconMenu2, IconX, IconShoppingCart, IconUser } from '@tabler/icons-reac
 import { useAuth } from '../../lib/auth-context';
 import { useCart } from '../../lib/cart-context';
 import { useTranslation } from '../../lib/hooks/useTranslation';
+import { LanguageSelector } from '../LanguageSelector';
 
 interface NavbarProps {
   isScrollable?: boolean;
@@ -97,7 +98,10 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
+            {/* Language Selector */}
+            <LanguageSelector />
+            
             {/* Cart */}
             <Link href={`/${lang}/cart`} className="relative">
               <IconShoppingCart className={`w-6 h-6 transition-colors ${
@@ -129,19 +133,19 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
                     {user.role === 'admin' ? 'Admin Panel' : 'My Dashboard'}
                   </Button>
                 </Link>
-                <Button 
-                  variant="outline" 
-                  className={`${
-                    isScrollable && isScrolled 
-                      ? 'border-gray-300 text-gray-700 hover:bg-gray-50' 
-                      : isScrollable 
-                      ? 'border-white/20 text-white hover:bg-white/10' 
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
+                                  <Button 
+                    variant="outline" 
+                    className={`${
+                      isScrollable && isScrolled 
+                        ? 'border-gray-300 text-gray-700 hover:bg-gray-50' 
+                        : isScrollable 
+                        ? 'border-white/20 text-white hover:bg-white/10' 
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                    onClick={handleLogout}
+                  >
+                    {t('navigation.logout')}
+                  </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-4">
@@ -153,12 +157,12 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
                       ? 'text-white hover:bg-white/10' 
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}>
-                    Sign In
+                    {t('navigation.signIn')}
                   </Button>
                 </Link>
                 <Link href={`/${lang}/register`}>
                   <Button className="bg-primary-500 hover:bg-primary-600 text-white">
-                    Get Started
+                    {t('navigation.getStarted')}
                   </Button>
                 </Link>
               </div>
@@ -191,6 +195,11 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-lg">
+              {/* Mobile Language Selector */}
+              <div className="px-3 py-1">
+                <LanguageSelector />
+              </div>
+              
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -209,7 +218,7 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
                 onClick={closeMenu}
               >
                 <div className="flex items-center justify-between">
-                  <span>Cart</span>
+                  <span>{t('navigation.cart')}</span>
                   {cartCount > 0 && (
                     <span className="bg-primary-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {cartCount}
@@ -226,14 +235,14 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
                     className="block px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
                     onClick={closeMenu}
                   >
-                    {user.role === 'admin' ? 'Admin Panel' : 'My Dashboard'}
+                    {user.role === 'admin' ? t('navigation.adminPanel') : t('navigation.myDashboard')}
                   </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                  >
-                    Logout
-                  </button>
+                                      <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                    >
+                      {t('navigation.logout')}
+                    </button>
                 </div>
               ) : (
                 <div className="space-y-2 pt-2 border-t border-gray-200">
@@ -242,14 +251,14 @@ export default function Navbar({ isScrollable = false }: NavbarProps) {
                     className="block px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
                     onClick={closeMenu}
                   >
-                    Sign In
+                    {t('navigation.signIn')}
                   </Link>
                   <Link
                     href={`/${lang}/register`}
                     className="block px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
                     onClick={closeMenu}
                   >
-                    Get Started
+                    {t('navigation.getStarted')}
                   </Link>
                 </div>
               )}

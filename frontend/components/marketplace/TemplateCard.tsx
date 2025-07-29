@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { IconShoppingCart, IconHeart, IconStar, IconDownload, IconEye, IconExternalLink } from '@tabler/icons-react';
+import { useTranslation } from '../../lib/hooks/useTranslation';
 
 interface TemplateCardProps {
   template: {
@@ -46,6 +47,7 @@ export function TemplateCard({
   const router = useRouter();
   const { user } = useAuth();
   const { incrementCartCount } = useCart();
+  const { t } = useTranslation();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isInWishlistState, setIsInWishlistState] = useState(isInWishlist);
   const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);

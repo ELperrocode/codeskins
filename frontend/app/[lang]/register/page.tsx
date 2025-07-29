@@ -49,27 +49,27 @@ export default function RegisterPage() {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.username.trim()) {
-      newErrors.username = t('auth.register.usernameRequired');
+      newErrors.username = t('auth.errors.usernameRequired');
     } else if (formData.username.length < 3) {
-      newErrors.username = t('auth.register.usernameMinLength');
+      newErrors.username = t('auth.errors.usernameMinLength');
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = t('auth.register.emailRequired');
+      newErrors.email = t('auth.errors.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = t('auth.register.emailInvalid');
+      newErrors.email = t('auth.errors.emailInvalid');
     }
 
     if (!formData.password) {
-      newErrors.password = t('auth.register.passwordRequired');
+      newErrors.password = t('auth.errors.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = t('auth.register.passwordMinLength');
+      newErrors.password = t('auth.errors.passwordMinLength');
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = t('auth.register.confirmPasswordRequired');
+      newErrors.confirmPassword = t('auth.errors.confirmPasswordRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t('auth.register.passwordsDoNotMatch');
+      newErrors.confirmPassword = t('auth.errors.passwordsDoNotMatch');
     }
 
     setErrors(newErrors);
@@ -178,7 +178,7 @@ export default function RegisterPage() {
                 <AuthInput delay={0.1}>
                   <div className="space-y-2">
                     <Label htmlFor="email" className="font-medium">
-                      {t.auth.email}
+                      {t('auth.email')}
                     </Label>
                     <div className="relative group">
                       <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
@@ -188,7 +188,7 @@ export default function RegisterPage() {
                         id="email"
                         name="email"
                         type="email"
-                        placeholder={t.auth.emailPlaceholder}
+                        placeholder={t('auth.emailPlaceholder')}
                         value={formData.email}
                         onChange={handleInputChange}
                         required
@@ -208,7 +208,7 @@ export default function RegisterPage() {
                 <AuthInput delay={0.2}>
                   <div className="space-y-2">
                     <Label htmlFor="password" className="font-medium">
-                      {t.auth.password}
+                      {t('auth.password')}
                     </Label>
                     <div className="relative group">
                       <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
@@ -218,7 +218,7 @@ export default function RegisterPage() {
                         id="password"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
-                        placeholder={t.auth.passwordPlaceholder}
+                        placeholder={t('auth.passwordPlaceholder')}
                         value={formData.password}
                         onChange={handleInputChange}
                         required
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                 <AuthInput delay={0.3}>
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword" className="font-medium">
-                      {t.auth.confirmPassword}
+                      {t('auth.confirmPassword')}
                     </Label>
                     <div className="relative group">
                       <AuthIcon className="absolute left-3 top-3 h-5 w-5 group-focus-within:text-primary-400 transition-colors">
@@ -260,7 +260,7 @@ export default function RegisterPage() {
                         id="confirmPassword"
                         name="confirmPassword"
                         type={showConfirmPassword ? 'text' : 'password'}
-                        placeholder={t.auth.confirmPasswordPlaceholder}
+                        placeholder={t('auth.confirmPasswordPlaceholder')}
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
                         required
@@ -298,12 +298,12 @@ export default function RegisterPage() {
                       <AuthSpinner>
                         <div className="flex items-center gap-3">
                           <div className="w-5 h-5 border-2 border-text-inverse border-t-transparent rounded-full animate-spin"></div>
-                          <span>{t.auth.creatingAccount}</span>
+                          <span>{t('auth.creatingAccount')}</span>
                         </div>
                       </AuthSpinner>
                     ) : (
                       <div className="flex items-center gap-3">
-                        <span>{t.auth.createAccount}</span>
+                        <span>{t('auth.createAccount')}</span>
                         <IconArrowRight className="w-5 h-5" />
                       </div>
                     )}
@@ -314,13 +314,13 @@ export default function RegisterPage() {
               <AuthLink>
                 <div className="mt-8 text-center">
                   <p className="text-white text-base">
-                    {t.auth.hasAccount}{' '}
+                    {t('auth.hasAccount')}{' '}
                     <Button
                       variant="link"
                       onClick={() => router.push(`/${lang}/login`)}
                       className="p-0 h-auto text-primary-400 hover:text-primary-300 font-semibold text-base transition-colors duration-300"
                     >
-                      {t.auth.signIn}
+                      {t('auth.signIn')}
                     </Button>
                   </p>
                 </div>

@@ -46,10 +46,10 @@ export function TemplateCTA({ template, onAddToCart, addingToCart }: TemplateCTA
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            {t('templates.cta.title')}
+            Ready to Get Started?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            {t('templates.cta.description', { template: template.title })}
+            Get instant access to {template.title} and start building your project today.
           </p>
         </motion.div>
 
@@ -70,8 +70,8 @@ export function TemplateCTA({ template, onAddToCart, addingToCart }: TemplateCTA
                       <IconDownload className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{t('templates.cta.benefits.instantDownload.title')}</h3>
-                      <p className="text-sm text-gray-600">{t('templates.cta.benefits.instantDownload.description')}</p>
+                      <h3 className="font-semibold text-gray-900">Instant Download</h3>
+                      <p className="text-sm text-gray-600">Get your files immediately after purchase</p>
                     </div>
                   </div>
                 </CardContent>
@@ -84,8 +84,8 @@ export function TemplateCTA({ template, onAddToCart, addingToCart }: TemplateCTA
                       <IconShield className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{t('templates.cta.benefits.securePayment.title')}</h3>
-                      <p className="text-sm text-gray-600">{t('templates.cta.benefits.securePayment.description')}</p>
+                      <h3 className="font-semibold text-gray-900">Secure Payment</h3>
+                      <p className="text-sm text-gray-600">Your payment is protected by Stripe</p>
                     </div>
                   </div>
                 </CardContent>
@@ -98,8 +98,8 @@ export function TemplateCTA({ template, onAddToCart, addingToCart }: TemplateCTA
                       <IconClock className="w-5 h-5 text-purple-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{t('templates.cta.benefits.lifetimeUpdates.title')}</h3>
-                      <p className="text-sm text-gray-600">{t('templates.cta.benefits.lifetimeUpdates.description')}</p>
+                      <h3 className="font-semibold text-gray-900">Lifetime Updates</h3>
+                      <p className="text-sm text-gray-600">Get all future updates for free</p>
                     </div>
                   </div>
                 </CardContent>
