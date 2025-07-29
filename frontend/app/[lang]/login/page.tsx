@@ -20,10 +20,7 @@ import {
   AuthTitle, 
   AuthDescription, 
   AuthToggleButton,
-  AuthBackground,
-  FloatingParticles,
-  BackgroundWaves,
-  ConnectionLines
+  AuthBackground
 } from '../../../components/ui';
 import { IconUser, IconLock, IconArrowRight, IconEye, IconEyeOff } from '@tabler/icons-react';
 
@@ -103,11 +100,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
       {/* Fondo animado */}
-      <AuthBackground className="fixed inset-0">
-        <BackgroundWaves />
-        <FloatingParticles />
-        <ConnectionLines />
-      </AuthBackground>
+      <AuthBackground>
       
       {/* Contenido principal */}
       <AuthContainer className="relative z-10 flex items-center justify-center min-h-screen px-4 pt-16">
@@ -240,6 +233,7 @@ export default function LoginPage() {
           </Card>
         </AuthCard>
       </AuthContainer>
+      </AuthBackground>
     </div>
   );
 } 

@@ -13,8 +13,13 @@
     "test:e2e": "jest --config jest.e2e.config.js",
     "lint": "eslint src/**/*.ts tests/**/*.ts",
     "type-check": "tsc --noEmit",
-    "migrate": "tsx scripts/migrate-templates.ts",
-    "check-availability": "tsx scripts/update-template-availability.ts"
+    "seed": "tsx src/database/migrations/index.ts",
+    "seed:users": "tsx src/database/migrations/001-seed-users.ts",
+    "seed:categories": "tsx src/database/migrations/002-seed-categories.ts",
+    "seed:tags": "tsx src/database/migrations/003-seed-tags.ts",
+    "seed:licenses": "tsx src/database/migrations/004-seed-licenses.ts",
+    "seed:templates": "tsx src/database/migrations/005-seed-templates.ts",
+    "seed:reviews": "tsx src/database/migrations/006-seed-reviews.ts"
   },
   "dependencies": {
     "@fastify/cookie": "~9.3.1",

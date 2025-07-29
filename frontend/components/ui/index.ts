@@ -36,11 +36,4 @@ export {
   AuthDescription,
   AuthToggleButton,
   AuthBackground
-} from './auth-animations';
-
-// Floating particles and background effects
-export {
-  FloatingParticles,
-  BackgroundWaves,
-  ConnectionLines
-} from './floating-particles'; 
+} from './auth-animations'; 
